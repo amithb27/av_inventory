@@ -24,7 +24,7 @@ def Employees_List(request):
         if serializer.is_valid():
             serializer.save()
             return Response(status=status.HTTP_201_CREATED)
-        print(serializer.errors)
+        print(serializer.errors , "eoors are here")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 @api_view(['PUT', 'DELETE','GET'])
 def Employees_Details(request, pk):

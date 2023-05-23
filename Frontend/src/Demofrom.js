@@ -1,4 +1,4 @@
-import React,{useState,useEffect , useMemo} from "react";
+import React,{useState,useEffect } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import {
   
@@ -8,14 +8,13 @@ import {
   Dialog,
   DialogHeader,
   DialogBody,
-  DialogFooter,
   IconButton,
   Typography,
-  MenuItem,
+
   } from "@material-tailwind/react";
   import DeleteIcon from '@mui/icons-material/Delete';
-import { containerClasses } from "@mui/material";
-import {GetData} from './Fetching'
+
+import {requestBackend} from './Fetching'
   const TABLE_HEAD = ["Name", "Role", "reportedTo",""];
   export default function Form() {
     const [TABLE_ROWS,setTABLE_ROWS] = useState([])
@@ -27,13 +26,25 @@ import {GetData} from './Fetching'
     const handleOpen = () => setOpen((cur) => !cur);
    
      useEffect(()=>{
-      const waiting= async()=>{
-      const  tableData= await GetData("employee/","GET",(data)=>{setTABLE_ROWS(data)})
-
-       
-         }   
-
-         waiting()
+      let outList=[]
+      let outData
+         const data = requestBackend("employee/","GET")
+         console.log(data ,"ASdfsdfdfd")
+         data.then(res=>{
+          res.map(ele=>{
+            outData={
+             name:ele.name
+             ,role:ele.role.name,
+             reportedTo:ele.reporting_Person,
+             pk:ele.pk
+          }
+          outList.push(outData)
+          return null
+         } ) 
+         setTABLE_ROWS(outList)
+         })
+        
+         
      },[changedData])
         
     return (
@@ -64,19 +75,14 @@ import {GetData} from './Fetching'
 
         e.preventDefault()
         console.log("submited")
-        const Postoptions={
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                },
-            body: JSON.stringify(data),
-        }
-        fetch("http://127.0.0.1:8000/employee/",Postoptions)
-        .then(data=>{
-            console.log(data)
+         const BackendPromsie= requestBackend("employee/","POST",data)
+         console.log(BackendPromsie,"BackendPromsie")
+          BackendPromsie.then(()=>{
             setChangedData(pre=>pre+1)
             handleOpen()
-        }).catch(err=>console.log(err))
+           
+          }).catch(err=>console.log(err))
+  
        
      }} className="mt-8 mb-2 w-80 max-w-screen-lg sm:w-96">
       <div className=" flex flex-row">
@@ -176,18 +182,14 @@ import {GetData} from './Fetching'
                 <td className={classes}>
                   <Typography  variant="small" color="red" className="cursor-pointer font-medium">
                     <div onClick={()=>{
-                        fetch("http://127.0.0.1:8000/employee/"+pk,{
-                            method:"DELETE",
-                            headers:{
-                                'Content-Type': 'application/json',
-                            },
-            
-                        }).then(()=>{
+                        requestBackend("employee/"+data.pk , "DELETE" )
+
+
                           setChangedData(pre=>pre-1)
-                        })
                       
 
-                    }} ><DeleteIcon /></div>
+                    }} >
+                      <DeleteIcon /></div>
                   </Typography>
                 </td>
               </tr>
