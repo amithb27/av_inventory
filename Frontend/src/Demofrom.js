@@ -182,10 +182,10 @@ import {requestBackend} from './Fetching'
                 <td className={classes}>
                   <Typography  variant="small" color="red" className="cursor-pointer font-medium">
                     <div onClick={()=>{
-                        requestBackend("employee/"+data.pk , "DELETE" )
-
-
-                          setChangedData(pre=>pre-1)
+                        const Promsie=requestBackend("employee/"+pk , "DELETE" )
+                        Promsie.then(()=>{
+                          setChangedData(data=>data-1)
+                        })
                       
 
                     }} >
