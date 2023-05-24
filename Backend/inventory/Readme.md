@@ -12,7 +12,7 @@
 
     if you are not installed then download and install 
 
-  go to here 👉👉    https://www.python.org/downloadsreleasepython-3111/
+  go to here 👉👉    https://www.python.org/downloads/macos/
     
 
 #### step2 install pip using get-pip.py.
