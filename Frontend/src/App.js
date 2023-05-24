@@ -12,12 +12,12 @@ function App() {
   //         <Signup/>
       
   //   </div>
-  // <div>
-  //   <Home/>
-  // </div>
-  <div >
-    <UserDemo/>
+  <div>
+    <Home/>
   </div>
+  // <div >
+  //   <UserDemo/>
+  // </div>
   
 
   );
