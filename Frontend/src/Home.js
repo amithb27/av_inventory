@@ -12,7 +12,7 @@ function Home() {
       <div className='hidden lg:block ml-8 '><Directory/></div>
       <div className='flex flex-row'>
       
-      <div className='w-4/12 min-w-[350px] '><Sidebar/></div>
+      <div className='w-[350px] '><Sidebar/></div>
       
       <div className='w-7/12'><HomeTabs/>
       <UserDemo/> </div>

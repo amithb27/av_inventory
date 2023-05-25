@@ -51,21 +51,22 @@ import {requestBackend} from './Fetching'
         <div>
             <Button onClick={handleOpen} className="w-4/12 ml-[650px] mb-10  ">Register an employee </Button>
 
-          <Dialog size="lg" open={open} handler={handleOpen} > 
+          <Dialog  className="bg-transparent" size="lg" open={open} handler={handleOpen} > 
       
       <DialogHeader>
       <IconButton
-        color="blue-gray"
+        color="blue"
         size="sm"
         variant="text"
+        className="ml-auto"
         onClick={handleOpen}
       >
-        <XMarkIcon strokeWidth={2} className="h-5 w-5 mr-auto" />
+        <XMarkIcon strokeWidth={4}  className="h-5 w-5 mr-auto" />
       </IconButton>
       </DialogHeader>
      <DialogBody>
       <Card className="mx-auto px-52" color="transparent" shadow={false}>
-     <Typography variant="h4" color="blue-gray">
+     <Typography variant="h4" color="blue">
        Register Form 
   </Typography>
     <Typography color="gray" className="mt-1 font-normal">
@@ -89,38 +90,38 @@ import {requestBackend} from './Fetching'
       <div className="mb-4 flex flex-col gap-6">
         <Input onChange={(e)=>{
             setData({...data,name:e.target.value})
-        }} size="md" label="Name" />
+        }} size="md" label="Name" color="white" />
         <Input onChange={(e)=>{
             setData({...data,email:e.target.value})
-        }} size="md" label="Email" />
+        }} size="md" label="Email"color="white" />
         
         <Input onChange={(e)=>{
             setData({...data,phone:e.target.value})
-        }}size="md" label="phone" />
+        }}size="md" label="phone" color="white"/>
         <Input onChange={(e)=>{
             setData({...data,role:{name:e.target.value}})
-        }} size="md" label="Role" />
+        }} size="md" label="Role" color="white" />
         <Input onChange={(e)=>{
             setData({...data,reporting_Person:e.target.value})
-        }} size="md" label="Reporting Person" />
+        }} size="md" label="Reporting Person" color="white" />
       </div>
 
       <div className="mx-10 mb-4 flex flex-col gap-6">
       <Input onChange={(e)=>{
             setData({...data,Adress:{...data.Adress,country:e.target.value}})
-        }} size="md" label="country" />
+        }} size="md" label="country" color="white"/>
        <Input onChange={(e)=>{
             setData({...data,Adress:{...data.Adress,state:e.target.value}})
-        }} size="md" label="state" />
+        }} size="md" label="state" color="white"/>
         <Input onChange={(e)=>{
             setData({...data,Adress:{...data.Adress,city:e.target.value}})
-        }} size="md" label="city" />
+        }} size="md" label="city" color="white"/>
         <Input onChange={(e)=>{
             setData({...data,Adress:{...data.Adress,zip_code:e.target.value}})
-        }} size="md" label="pin code" />
+        }} size="md" label="pin code" color="white" />
         <Input onChange={(e)=>{
             setData({...data,Adress:{...data.Adress,zone:e.target.value}})
-        }} size="md" label="zone" />
+        }} size="md" label="zone" color="white"/>
       </div>
       </div>
 
@@ -140,12 +141,12 @@ import {requestBackend} from './Fetching'
       <div className=' ml-[260px] w-6/12'> <Typography variant="h4" color="blue-gray">
           Emplooyee List
         </Typography></div>
-      <Card className="  ml-20 overflow-scroll h-full w-full">
+      <Card className=" overflow-scroll h-full  w-[1000px]">
       <table className="w-full min-w-max table-auto text-left">
         <thead>
           <tr>
             {TABLE_HEAD.map((head) => (
-              <th key={head} className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
+              <th key={head} className="border-b  border-blue-gray-100 bg-blue-gray-50 p-4">
                 <Typography
                   variant="small"
                   color="blue-gray"
