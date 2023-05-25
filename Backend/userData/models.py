@@ -2,6 +2,7 @@ from typing import Iterable, Optional
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils import timezone
+import random
 # Create your models here.
 
 # class UserManager(BaseUserManager):
@@ -45,6 +46,81 @@ from django.utils import timezone
 #         self.user_Name = self.first_Name + self.last_Name
 #         super().save(*args, **kwargs)
         
+class Client_Details(models.Model):
+    ## This creates a model for a Client_Details
+    customer_Name = models.CharField(max_length=100)
+    website = models.TextField()
+    reference = models.TextField()
+    description = models.TextField()
+    phone_Number = models.IntegerField()
+    landline_Number = models.IntegerField()
+    pan_Number = models.CharField(max_length=100)
+    is_Active = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return self.customer_Name
+         
+class contact_Details(models.Model):
+    
+    ## This creates a model for a contact_Details
+    customer_Name = models.CharField(max_length=100)
+    contact_Person = models.CharField(max_length=100)
+    mobile_Number = models.IntegerField()
+    alternate_Mobile_Number = models.IntegerField()
+    emailId = models.EmailField()
+    designation = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.customer_Name  
+
+class Billing_Details(models.Model):
+    
+    ## This creates a model for a Billing_Details
+    address = models.TextField()
+    zone = models.CharField(max_length=100) 
+    country = models.CharField(max_length=100) 
+    state = models.CharField(max_length=100) 
+    city = models.CharField(max_length=100) 
+    pin_Code = models.IntegerField() 
+    billing_Name = models.CharField(max_length=100) 
+    billing_GSTIN = models.CharField(max_length=100) 
+    pAN_Number = models.CharField(max_length=100) 
+    udyog_Aadhar = models.IntegerField() 
+    export_No = models.CharField(max_length=100) 
+
+    def __str__(self):
+        return self.country 
+    
+    
+    
+    
+    
+class Shipping_Address(models.Model):
+    
+    ## This creates a model for a Shipping_Address
+    address = models.CharField(max_length=100)
+    zone = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    pin_Code = models.IntegerField()
+    sales_Person = models.CharField(max_length=100)
+    
+  
+    def __str__(self):
+        return self.name  
+
+    
+     
+
+class Customer(models.Model):
+        ## This creates a model for a Customer
+      customer_Id  =  models.CharField(max_length=100)
+      client_Details  = models.ForeignKey(Client_Details , on_delete=models.PROTECT)
+      billing_Details = models.ForeignKey(Billing_Details , on_delete=models.PROTECT)
+      shipping_Address = models.ForeignKey(Shipping_Address , on_delete=models.PROTECT)
+        
+      def __str__(self) :
+          return  self.customer_Id
 class Adress(models.Model):
     ## this model is to store the adress of all employees
         country = models.CharField(max_length=100)
