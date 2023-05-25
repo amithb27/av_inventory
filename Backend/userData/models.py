@@ -77,7 +77,6 @@ class Role(models.Model):
 class Employee(models.Model):
     
     ## This creates a model for a Employee
-    
     name = models.CharField(max_length=240)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20)

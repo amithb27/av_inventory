@@ -11,7 +11,7 @@ export default function HomeTabs() {
   const [activeTab, setActiveTab] = React.useState(0);
   const data = [
     {
-      label: "OptionA",
+      label: "Employee List",
       value: 0,
       
     },

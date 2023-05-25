@@ -48,8 +48,8 @@ import {requestBackend} from './Fetching'
      },[changedData])
         
     return (
-        <div className="obsolute">
-            <Button onClick={handleOpen} className=" mb-10 ml-[500px] ">Register an employee </Button>
+        <div>
+            <Button onClick={handleOpen} className="w-4/12 ml-[650px] mb-10  ">Register an employee </Button>
 
           <Dialog size="lg" open={open} handler={handleOpen} > 
       
@@ -137,7 +137,7 @@ import {requestBackend} from './Fetching'
     
      </Dialog>
       
-      <div className='  ml-[550px] w-10/12'> <Typography variant="h4" color="blue-gray">
+      <div className=' ml-[260px] w-6/12'> <Typography variant="h4" color="blue-gray">
           Emplooyee List
         </Typography></div>
       <Card className="  ml-20 overflow-scroll h-full w-full">
