@@ -1,11 +1,35 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework import status
+from rest_framework.decorators import api_view 
+from rest_framework import status 
 from .models import *
 from .serializers import *
 # Create your views here.
+
+
+@api_view(['POST'])
+def create_role(request):
+    #   user validations request.user.is_validuser
+    roleData=request.data
+    
+    if request.method == "POST":
+         serializers=RoleHierarchySerializer(data=roleData)
+         if serializers.is_valid():
+             return Response (status=status.HTTP_201_CREATED)
+         return Response( serializers.errors ,status=status.HTTP_400_BAD_REQUEST)
+    
+        
+    if request.method == "GET":
+        available_roles = RoleHierarchy.objects.all()
+        serializedData = RoleHierarchy(available_roles)
+        return Response( serializedData.data)
+        
+    
+
+
+
+
 
 @api_view(['GET', 'POST'])
 def Employees_List(request):

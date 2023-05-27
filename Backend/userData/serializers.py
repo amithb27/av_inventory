@@ -6,6 +6,26 @@ class RoleSerializer(serializers.ModelSerializer):
         model = Role
         fields = ( 'name',)
 
+class RoleHierarchySerializer(serializers.ModelSerializer):
+     class Meta:
+        model = RoleHierarchy
+        fields = ( 'name', 'parent')
+     def create(self, validated_data):
+         if validated_data.name == validated_data.reportingRole:
+             root=RoleHierarchy.add_root(validated_data.name)
+             return root
+       
+         try:
+           reportingrole = RoleHierarchy.objects.get(name=validated_data.reportingRole)
+           child= RoleHierarchy.add_child(name=validated_data.name,parent=reportingrole)
+           return  child
+       
+         except RoleHierarchy.DoesNotExist:
+             root=RoleHierarchy.add_root(validated_data.reportingRole)
+             child= RoleHierarchy.add_child(name=validated_data.name , parent=root)
+             return  child
+         
+
 
 
 class AdressSerializer(serializers.ModelSerializer):

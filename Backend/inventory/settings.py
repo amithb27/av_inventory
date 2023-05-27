@@ -36,9 +36,9 @@ CORS_ORIGIN_WHITELIST = [
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
-     'userData',
-     'rest_framework',
-     'corsheaders',
+    'userData',
+    'rest_framework',
+    'corsheaders',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -77,8 +77,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'inventory.wsgi.application'
 
-# AUTH_USER_MODEL = 'userData.My_User'
 
+
+# AUTH_USER_MODEL = 'userData.user'
 
 
 # Database

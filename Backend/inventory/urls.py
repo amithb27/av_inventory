@@ -20,5 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("employee/", Employees_List, name="employee_list"),
     path("employee/<int:pk>", Employees_Details, name="employee_list" ),
-    
+    path('createRole/', create_role , name="create_role" )
 ]
