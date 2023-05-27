@@ -8,7 +8,7 @@ from .serializers import *
 # Create your views here.
 
 
-@api_view(['POST'])
+@api_view(['POST',"GET"])
 def create_role(request):
     #   user validations request.user.is_validuser
     roleData=request.data
@@ -22,7 +22,8 @@ def create_role(request):
         
     if request.method == "GET":
         available_roles = RoleHierarchy.objects.all()
-        serializedData = RoleHierarchy(available_roles)
+        print(available_roles)
+        serializedData = RoleHierarchySerializer(available_roles , many=True)
         return Response( serializedData.data)
         
     

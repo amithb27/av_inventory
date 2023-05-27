@@ -1,4 +1,5 @@
 
+from typing import Any
 from django.db import models
 from django.contrib.auth.models import AbstractUser,Group , Permission 
 from treebeard.mp_tree import MP_Node
@@ -42,7 +43,8 @@ class RoleHierarchy (MP_Node):
       
       parent = models.ForeignKey('self',on_delete=models.CASCADE, blank=True , null=True , related_name="children")
       
-       
+      def __str__(self):
+           return self.name
          
         
 # class Client_Details(models.Model):
