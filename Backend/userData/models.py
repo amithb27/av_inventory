@@ -11,6 +11,7 @@ from django.utils import timezone
     
 
 class user(AbstractUser):
+    counter = models.IntegerField(blank=True ,null=True )
     user_permissions = models.ManyToManyField(Permission , related_name="Permited_user")
     email = models.EmailField(unique=True,)
     username= models.CharField( max_length=100 ,unique=True)
@@ -19,8 +20,6 @@ class user(AbstractUser):
     REQUIRED_FIELDS=["email","password"]
     def __str__(self):
         return self.username
-   
-    
 
         
 class RoleHierarchy (MP_Node):

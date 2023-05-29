@@ -24,7 +24,7 @@ class Create_User(View):
     
     def post(self,request,isAdmin):
         user.create
-        
+      
 
 
 
