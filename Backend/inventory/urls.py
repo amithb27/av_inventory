@@ -20,5 +20,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("employee/", Employees_List, name="employee_list"),
     path("employee/<int:pk>", Employees_Details, name="employee_list" ),
-    path('createRole/', create_role , name="create_role" )
+    path('createRole/', create_role.as_view() , name="create_role" ),
+    path('template/', templateView ,name="home"),
+    path('employee/<str:role>', create_role.as_view() , name="reporting_role_callback ")
 ]

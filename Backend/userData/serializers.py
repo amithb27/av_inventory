@@ -1,15 +1,12 @@
 from rest_framework import serializers
 from .models import *
 
-class RoleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Role
-        fields = ( 'name',)
+
 
 class RoleHierarchySerializer(serializers.ModelSerializer):
      class Meta:
         model = RoleHierarchy
-        fields = ( 'name', 'parent')
+        fields = ( 'role', 'reporting_Role')
      def create(self, validated_data):
          if validated_data.name == validated_data.reportingRole:
              root=RoleHierarchy.add_root(validated_data.name)
@@ -26,17 +23,15 @@ class RoleHierarchySerializer(serializers.ModelSerializer):
              return  child
          
 
-
-
 class AdressSerializer(serializers.ModelSerializer):
     
     class Meta:
         model= Adress
-        fields=("country","city","state","zip_code","zone")
+        fields=("country","city","state","zip_Code","zone")
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
-    role=RoleSerializer()
+    role=RoleHierarchySerializer()
     Adress=AdressSerializer()
     class Meta:
         model = Employee 
@@ -58,10 +53,18 @@ class EmployeeSerializer(serializers.ModelSerializer):
         print(role,"this is role")
         my_Adress=Adress.objects.create(city=city,country=country,
             zip_code=zip_code , zone=zone)
-        my_Role=Role.objects.get(name=role)
+        my_Role=RoleHierarchy.objects.get(name=role)
         my_Employee=Employee.objects.create(name=name, email=email,
                                             phone=phone, reporting_Person=reporting_Person,
                                             created_By=created_By,
                                             role=my_Role, Adress=my_Adress)
         
         return my_Employee
+    
+class UserSerializer(serializers.ModelSerializer):
+       class Meta:
+           model = user
+           fields = ["username","user_permissions","email","groups","password","firstname","lastname"]
+       def create(self, validated_data):
+           pass
+           return super().create(validated_data)    

@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'inventory.wsgi.application'
 
 
 
-# AUTH_USER_MODEL = 'userData.user'
+AUTH_USER_MODEL = 'userData.user'
 
 
 # Database
