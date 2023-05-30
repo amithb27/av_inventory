@@ -28,15 +28,11 @@ class Create_User(APIView):
             return Response(serializer, status= status.HTTP_201_CREATED)
         return Response(serializer.errors , status= status)
             
-        
-
-
-
 
 
 class create_role(APIView):
     # User validations request.user.is_validuser
-    
+        
     def post(self,request):
         roleData=request.data  
         serializers=RoleHierarchySerializer(data=roleData)
@@ -48,7 +44,7 @@ class create_role(APIView):
     def get(self,request,role):
         role_object =get_object_or_404(RoleHierarchy, name=role)    
         available_reporting_roles = role_object.get_ancestors()
-        serializer = RoleHierarchySerializer(available_reporting_roles)
+        serializer = RoleHierarchySerializer(available_reporting_roles , )
         print(serializer.data)
         return  serializer.data
     
@@ -63,23 +59,24 @@ def templateView(request):
 
 @api_view(['GET', 'POST'])
 def Employees_List(request):
+    requestedUser = request.user.username
     if request.method == 'GET':
         
         data = Employee.objects.all()
-  
-        serializer = EmployeeSerializer(data, context={'request': request}, many=True)
-       
-        return Response(serializer.data)
 
+        serializer = EmployeeSerializer(data, many=True)
+       
+        return Response(serializer.data ,status=status.HTTP_200_OK)
+    
     elif request.method == 'POST':
         print(request.data, "usernamee")
-        
-        serializer = EmployeeSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
-       
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if requestedUser.join_Count <=0 :
+            serializer = EmployeeSerializer(data=request.data ,context = {"requestedUser" ,requestedUser})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(data = {"error":"You exceeded your count limit "} ,status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['PUT', 'DELETE','GET'])
 def Employees_Details(request, pk):
@@ -98,4 +95,4 @@ def Employees_Details(request, pk):
     
     elif request.method == 'GET':
         data=EmployeeSerializer(emp)
-        return Response(data.data)
+        return Response(data.data , status=status.HTTP_302_FOUND)

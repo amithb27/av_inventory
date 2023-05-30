@@ -40,6 +40,8 @@ class EmployeeSerializer(serializers.ModelSerializer):
                   "created_By",
         )
     def create(self, validated_data):
+        current_user = self.context.get("requestedUser")
+        current_user.join_Count -= 1    
         name=validated_data['name']
         email=validated_data['email']
         role=validated_data['role']['name']
@@ -59,6 +61,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
                                             created_By=created_By,
                                             role=my_Role, Adress=my_Adress)
         
+        current_user.save()
         return my_Employee
     
 class UserSerializer(serializers.ModelSerializer):
@@ -69,6 +72,8 @@ class UserSerializer(serializers.ModelSerializer):
            type = self.context.get("type")
            myUser = user if type == "user" else Admin
            createdUser = myUser.objects.create(validated_data)
+           createdUser.is_staff = True
+           createdUser.is_superuser = True 
            return createdUser  
        
  

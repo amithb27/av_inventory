@@ -9,6 +9,7 @@ from django.utils import timezone
 
 # Create your models here.
 class Admin(AbstractUser):
+    user_permissions = models.ManyToManyField(Permission , related_name="Permited_Admins")
     join_Count = models.IntegerField(default=10)
     email = models.EmailField(unique=True,)
     username= models.CharField( max_length=100 ,unique=True)
@@ -17,7 +18,10 @@ class Admin(AbstractUser):
     REQUIRED_FIELDS=["email","password"]
 
     def __str__(self):
+        
         return self.username
+    class Meta:
+        verbose_name_plural = "Admins"
 class user(AbstractUser):
     user_permissions = models.ManyToManyField(Permission , related_name="Permited_user")
     email = models.EmailField(unique=True,)
@@ -29,7 +33,7 @@ class user(AbstractUser):
         return self.username
 
         
-class RoleHierarchy (MP_Node):
+class RoleHierarchy(MP_Node):
       role = models.CharField(max_length=100 , unique=True)
       role_Created = models.DateTimeField(auto_now_add=True)
       role_Modified = models.DateTimeField(auto_now=True)
@@ -70,12 +74,6 @@ class Employee(models.Model):
     reporting_Person = models.CharField(max_length=200)
     Adress = models.ForeignKey(Adress,on_delete=models.PROTECT )
     registration_Date = models.DateField(auto_now_add=True,)
+    
     def __str__(self):
         return self.name 
-    class Meta :
-        permissions =[
-            ("Add_employee","permission to add an new employee"),
-            ("Edit_employee","permission to Edit an new employee"),
-            ("Delete_employee","permission to Delete an new employee"),
-            ("View_employee","permission to see Details of an new employee"),
-        ]
