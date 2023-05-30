@@ -3,19 +3,26 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser,Group , Permission 
 from treebeard.mp_tree import MP_Node
+from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 
 
 # Create your models here.
-    
-    
+class Admin(AbstractUser):
+    join_Count = models.IntegerField(default=10)
+    email = models.EmailField(unique=True,)
+    username= models.CharField( max_length=100 ,unique=True)
+    groups = models.ManyToManyField(Group , related_name="admins")
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS=["email","password"]
 
+    def __str__(self):
+        return self.username
 class user(AbstractUser):
-    counter = models.IntegerField(blank=True ,null=True )
     user_permissions = models.ManyToManyField(Permission , related_name="Permited_user")
     email = models.EmailField(unique=True,)
     username= models.CharField( max_length=100 ,unique=True)
-    groups = models.ManyToManyField(Group , related_name="members")
+    groups = models.ManyToManyField(Group , related_name="users")
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS=["email","password"]
     def __str__(self):

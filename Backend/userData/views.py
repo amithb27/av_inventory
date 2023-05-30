@@ -3,15 +3,14 @@ from rest_framework.response import Response
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.decorators import api_view 
-from rest_framework.views import View
+from rest_framework.views import APIView
 from rest_framework import status 
 from .models import *
 from .serializers import *
 from django.contrib.auth.decorators import permission_required
 # Create your views here.
 
-class Create_Groups(View) :
-    @permission_required(["userData.Add_group"],raise_exception=True)
+class Create_Groups(APIView) :
     def post(self,request,name):
      try :   
         group = Group.objects.get(name=name)
@@ -20,32 +19,31 @@ class Create_Groups(View) :
          Group.objects.create(name=name)
 
 
-class Create_User(View):
-    
-    def post(self,request,isAdmin):
-        user.create
-      
+class Create_User(APIView):
+
+    def post(self,request,type):
+        serializer = UserSerializer(data=request.data ,context ={"type":type} )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer, status= status.HTTP_201_CREATED)
+        return Response(serializer.errors , status= status)
+            
+        
 
 
 
 
 
-
-class create_role(View):
+class create_role(APIView):
     # User validations request.user.is_validuser
     
     def post(self,request):
         roleData=request.data  
         serializers=RoleHierarchySerializer(data=roleData)
         if serializers.is_valid():
+            serializers.save()
             return Response (status=status.HTTP_201_CREATED)
         return Response( serializers.errors ,status=status.HTTP_400_BAD_REQUEST)
-    
-    def get(self,request): 
-        available_roles = RoleHierarchy.objects.all()
-        print(available_roles)
-        serializedData = RoleHierarchySerializer(available_roles , many=True)
-        return Response(serializedData.data)
     
     def get(self,request,role):
         role_object =get_object_or_404(RoleHierarchy, name=role)    
@@ -53,6 +51,12 @@ class create_role(View):
         serializer = RoleHierarchySerializer(available_reporting_roles)
         print(serializer.data)
         return  serializer.data
+    
+    def get(self,request): 
+        available_roles = RoleHierarchy.objects.all()
+        print(available_roles)
+        serializedData = RoleHierarchySerializer(available_roles , many=True)
+        return Response(serializedData.data)
     
 def templateView(request):
     return render(request,"index.html")

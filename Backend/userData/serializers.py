@@ -66,5 +66,9 @@ class UserSerializer(serializers.ModelSerializer):
            model = user
            fields = ["username","user_permissions","email","groups","password","firstname","lastname"]
        def create(self, validated_data):
-           pass
-           return super().create(validated_data)    
+           type = self.context.get("type")
+           myUser = user if type == "user" else Admin
+           createdUser = myUser.objects.create(validated_data)
+           return createdUser  
+       
+ 
