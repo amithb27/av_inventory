@@ -9,7 +9,6 @@ from rest_framework.views import APIView
 from rest_framework import status 
 from .models import *
 from .serializers import *
-from django.views import View
 from django.contrib.auth.decorators import permission_required
 # Create your views here.
 
@@ -33,10 +32,6 @@ class Create_User(APIView):
                 serializer.save()
                 return Response(serializer, status= status.HTTP_201_CREATED)
             return Response(serializer.errors , status= status)
-
-
-
-
 
 
 class create_role(APIView):
