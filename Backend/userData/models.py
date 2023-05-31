@@ -5,23 +5,8 @@ from django.contrib.auth.models import AbstractUser,Group , Permission
 from treebeard.mp_tree import MP_Node
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-
-
 # Create your models here.
-class Admin(AbstractUser):
-    user_permissions = models.ManyToManyField(Permission , related_name="Permited_Admins")
-    join_Count = models.IntegerField(default=10)
-    email = models.EmailField(unique=True,)
-    username= models.CharField( max_length=100 ,unique=True)
-    groups = models.ManyToManyField(Group , related_name="admins")
-    USERNAME_FIELD = "username"
-    REQUIRED_FIELDS=["email","password"]
 
-    def __str__(self):
-        
-        return self.username
-    class Meta:
-        verbose_name_plural = "Admins"
 class user(AbstractUser):
     user_permissions = models.ManyToManyField(Permission , related_name="Permited_user")
     email = models.EmailField(unique=True,)
@@ -37,8 +22,7 @@ class RoleHierarchy(MP_Node):
       role = models.CharField(max_length=100 , unique=True)
       role_Created = models.DateTimeField(auto_now_add=True)
       role_Modified = models.DateTimeField(auto_now=True)
-      reporting_Role = models.ForeignKey('self',on_delete=models.CASCADE, blank=True , null=True , related_name="children")
-      
+      reporting_role = models.ForeignKey("self", blank=True , null=True  , on_delete=models.CASCADE )
       def __str__(self):
            return self.role
          
@@ -56,7 +40,7 @@ class Adress(models.Model):
         return self.city
     
     class Meta:
-        verbose_name_plural = "Adress Models"
+        verbose_name_plural = "Adress"
             
 
     
@@ -77,3 +61,18 @@ class Employee(models.Model):
     
     def __str__(self):
         return self.name 
+class Admin(AbstractUser):
+    user_permissions = models.ManyToManyField(Permission , related_name="Permited_Admins")
+    join_Count = models.IntegerField(default=10)
+    email = models.EmailField(unique=True,)
+    username= models.CharField( max_length=100 ,unique=True)
+    groups = models.ManyToManyField(Group , related_name="admins")
+    Employee = models.ForeignKey(Employee , on_delete=models.PROTECT )
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS=["email","password"]
+
+    def __str__(self):
+        
+        return self.username
+    class Meta:
+        verbose_name_plural = "Admins"

@@ -21,5 +21,6 @@ urlpatterns = [
     path("employee/", Employees_List, name="employee_list"),
     path("employee/<int:pk>", Employees_Details, name="employee_list" ),
     path('role/', create_role.as_view() , name="create_role" ),
-    path('role/<str:role>', create_role.as_view() , name="reporting_role_callback ")
+    path('role/<str:role>', create_role.as_view() , name="reporting_role_callback "),
+    path('role/<int:pk>', create_role.as_view() , name="reporting_role_callback ")
 ]

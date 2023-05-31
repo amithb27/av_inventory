@@ -53,6 +53,14 @@ class create_role(APIView):
         print(available_roles)
         serializedData = RoleHierarchySerializer(available_roles , many=True)
         return Response(serializedData.data)
+    def update(self , request,pk):
+        data = request.data
+        instance = RoleHierarchy.objects.get(pk=pk)
+        serializer =  RoleHierarchySerializer(instance = instance, data=data )
+        if serializer.is_valid():
+           updated =  serializer.save()
+           return Response(data=updated , status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
     
 def templateView(request):
     return render(request,"index.html")

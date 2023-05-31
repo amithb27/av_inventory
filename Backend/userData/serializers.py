@@ -4,24 +4,30 @@ from .models import *
 
 
 class RoleHierarchySerializer(serializers.ModelSerializer):
-     class Meta:
+    class Meta:
         model = RoleHierarchy
-        fields = ( 'role', 'reporting_Role')
-     def create(self, validated_data):
-         if validated_data.name == validated_data.reportingRole:
-             root=RoleHierarchy.add_root(validated_data.name)
-             return root
-       
-         try:
-           reportingrole = RoleHierarchy.objects.get(name=validated_data.reportingRole)
-           child= RoleHierarchy.add_child(name=validated_data.name,parent=reportingrole)
-           return  child
-       
-         except RoleHierarchy.DoesNotExist:
-             root=RoleHierarchy.add_root(validated_data.reportingRole)
-             child= RoleHierarchy.add_child(name=validated_data.name , parent=root)
-             return  child
-         
+        fields = ( 'role',"reporting_role")
+        def create(self, validated_data):
+            if validated_data.name == validated_data.reporting_role:
+                root=RoleHierarchy.add_root(role = validated_data.name )
+                return root
+
+            try:
+                reportingrole = RoleHierarchy.objects.get(role=validated_data.reporting_role)
+                child=reportingrole.add_child(role=validated_data.name,reporting_role=reportingrole)
+                return  child
+
+            except RoleHierarchy.DoesNotExist:
+                root=RoleHierarchy.add_root(validated_data.reporting_role)
+                child= root.add_child(role=validated_data.name , reporting_role=root)
+                return  child
+    
+        def update(self,instance, validated_data):
+            instance.role = validated_data.name
+            if instance.reporting_role != validated_data.reporting_role :
+                parent = RoleHierarchy.objects.get(reporting_role =validated_data.reporting_role )
+                instance.move(parent,pos="last_child")
+            instance.save()
 
 class AdressSerializer(serializers.ModelSerializer):
     
