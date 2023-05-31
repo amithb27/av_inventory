@@ -13,6 +13,7 @@ class user(AbstractUser):
     username= models.CharField( max_length=100 ,unique=True)
     groups = models.ManyToManyField(Group , related_name="users")
     USERNAME_FIELD = "username"
+    # Employee = models.ForeignKey(Employee , on_delete=models.PROTECT )
     REQUIRED_FIELDS=["email","password"]
     def __str__(self):
         return self.username

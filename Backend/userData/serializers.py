@@ -8,6 +8,7 @@ class RoleHierarchySerializer(serializers.ModelSerializer):
         model = RoleHierarchy
         fields = ( 'role',"reporting_role")
         def create(self, validated_data):
+            Group.objects.create(name=validated_data.name)
             if validated_data.name == validated_data.reporting_role:
                 root=RoleHierarchy.add_root(role = validated_data.name )
                 return root
@@ -68,6 +69,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
                                             role=my_Role, Adress=my_Adress)
         
         current_user.save()
+        
         return my_Employee
     
 class UserSerializer(serializers.ModelSerializer):
