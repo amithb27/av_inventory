@@ -1,11 +1,8 @@
-from django.shortcuts import render , get_object_or_404
-from rest_framework.authtoken.models import Token
-from rest_framework.renderers import JSONRenderer
+from django.shortcuts import  get_object_or_404
 from django.contrib.auth import authenticate, login,logout
+from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from rest_framework.response import Response
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
 from rest_framework.decorators import api_view 
 from rest_framework.views import APIView
 from rest_framework import status 
@@ -22,10 +19,6 @@ def Login(request):
     user = authenticate(request, username = requestedUser , password = password)   
     if user is not None :
         login(request)
-        token , created = Token.objects.get_or_create()
-        return Response(data={"token" : Token.key,
-                              "message":"login success"
-                              } , status=status.HTTP_200_OK)
     return Response(data="cannot login with the provided credentials " ,status=status.HTTP_401_UNAUTHORIZED)
 @api_view(["GET"])
 def Logout(request):
@@ -33,8 +26,10 @@ def Logout(request):
     return Response(data={
         "message":"logout success"}, status=status.HTTP_200_OK)
         
-@login_required        
+
+     
 class Create_User(APIView):
+        @method_decorator(login_required)
         @permission_required("userData.add_user")
         def post(self,request,type):
             serializer = UserSerializer(data=request.data ,context ={"type":type} )
@@ -47,8 +42,9 @@ class Create_User(APIView):
 
 class create_role(APIView):
     # User validations request.user.is_validuser
-    @login_required
-    @permission_required("userData.add_rolehierarchy")    
+    
+    @permission_required("userData.add_rolehierarchy")  
+    # @method_decorator(login_required)  
     def post(self,request):
         roleData=request.data  
         serializers=RoleHierarchySerializer(data=roleData)
@@ -56,8 +52,10 @@ class create_role(APIView):
             serializers.save()
             return Response (status=status.HTTP_201_CREATED)
         return Response(data = serializers.errors ,status=status.HTTP_400_BAD_REQUEST)
-    @login_required
-    @permission_required("userData.view_rolehierarchy")  
+    
+    
+    @method_decorator(login_required)
+    @method_decorator(permission_required("userData.view_rolehierarchy")) 
     def get(self,request,role):
         role_object =get_object_or_404(RoleHierarchy, name=role)    
         available_reporting_roles = role_object.get_ancestors()
@@ -65,16 +63,16 @@ class create_role(APIView):
         print(serializer.data)
         return  serializer.data
     
-    @login_required
-    @permission_required("userData.view_rolehierarchy")  
+    @method_decorator(login_required)
+    @method_decorator(permission_required("userData.view_rolehierarchy"))
     def get(self,request): 
         available_roles = RoleHierarchy.objects.all()
         print(available_roles)
         serializedData = RoleHierarchySerializer(available_roles , many=True)
         return Response(serializedData.data)
     
-    @login_required
-    @permission_required("userData.change_rolehierarchy") 
+    @method_decorator(login_required)
+    @method_decorator(permission_required("userData.change_rolehierarchy") )
     def update(self , request,pk):
         data = request.data
         instance = RoleHierarchy.objects.get(pk=pk)
@@ -84,15 +82,13 @@ class create_role(APIView):
            return Response(data=updated , status=status.HTTP_200_OK)
         return Response(data= serializer.errors ,status=status.HTTP_400_BAD_REQUEST)
     
-def templateView(request):
-    return render(request,"index.html")
-
 @api_view(['GET', 'POST'])
 @login_required
 @permission_required("userData.change_employee")
 def Employees_List(request):
+    print(request.session.session_key,"rhiss is session")
+
     requestedUser = request.user.username
-    print(request.META)
     if request.method == 'GET':
         data = Employee.objects.all()
 
