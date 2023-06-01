@@ -51,10 +51,13 @@ class user(AbstractUser):
     username= models.CharField( max_length=100 ,unique=True)
     groups = models.ManyToManyField(Group , related_name="users")
     USERNAME_FIELD = "username"  
-    Employee = models.ForeignKey(Employee , on_delete=models.PROTECT  , null=True , blank=True)
+    Employee = models.OneToOneField(Employee , on_delete=models.PROTECT  , null=True , blank=True)
     REQUIRED_FIELDS=["email","password"]
     def __str__(self):
         return self.username
+    class Meta:
+        verbose_name_plural = "Users"
+        
 
 class Admin(AbstractUser):
     user_permissions = models.ManyToManyField(Permission , related_name="Permited_Admins")
@@ -62,7 +65,7 @@ class Admin(AbstractUser):
     email = models.EmailField(unique=True,)
     username= models.CharField( max_length=100 ,unique=True)
     groups = models.ManyToManyField(Group , related_name="admins")
-    Employee = models.ForeignKey(Employee , on_delete=models.PROTECT )
+    Employee = models.OneToOneField(Employee , on_delete=models.PROTECT )
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS=["email","password"]
 
