@@ -1,2 +1,5 @@
 
-default_admin_join_Count = 10
+
+default_admin_join_Count = 15
+
+

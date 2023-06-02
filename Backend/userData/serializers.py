@@ -4,25 +4,15 @@ from .models import *
 
 
 class RoleHierarchySerializer(serializers.ModelSerializer):
+    # reporting_role = RoleHierarchySerializer
     class Meta:
         model = RoleHierarchy
         fields = ( 'role',"reporting_role")
+        
         def create(self, validated_data):
             Group.objects.create(name=validated_data.name)
-            if validated_data.name == validated_data.reporting_role:
-                root=RoleHierarchy.add_root(role = validated_data.name )
-                return root
+            root=RoleHierarchy.add_root(role = validated_data.name )
 
-            try:
-                reportingrole = RoleHierarchy.objects.get(role=validated_data.reporting_role)
-                child=reportingrole.add_child(role=validated_data.name,reporting_role=reportingrole)
-                return  child
-
-            except RoleHierarchy.DoesNotExist:
-                root=RoleHierarchy.add_root(validated_data.reporting_role)
-                child= root.add_child(role=validated_data.name , reporting_role=root)
-                return  child
-    
         def update(self,instance, validated_data):
             instance.role = validated_data.name
             if instance.reporting_role != validated_data.reporting_role :
@@ -33,16 +23,16 @@ class RoleHierarchySerializer(serializers.ModelSerializer):
 class AdressSerializer(serializers.ModelSerializer):
     
     class Meta:
-        model= Adress
+        model= Address
         fields=("country","city","state","zip_Code","zone")
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
     role=RoleHierarchySerializer()
-    Adress=AdressSerializer()
+    address=AdressSerializer()
     class Meta:
         model = Employee 
-        fields = ('pk', 'name','email','role','phone','Adress',
+        fields = ('pk', 'name','email','role','phone','address',
                   'status','reporting_Person','registration_Date',
                   "created_By",
         )
@@ -73,6 +63,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
         return my_Employee
     
 class UserSerializer(serializers.ModelSerializer):
+       
        class Meta:
            model = user
            fields = ["username","user_permissions","email","groups","password","firstname","lastname"]

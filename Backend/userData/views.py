@@ -25,9 +25,7 @@ def Logout(request):
     logout(request)
     return Response(data={
         "message":"logout success"}, status=status.HTTP_200_OK)
-        
 
-     
 class Create_User(APIView):
         @method_decorator(login_required)
         @permission_required("userData.add_user")
@@ -43,8 +41,8 @@ class Create_User(APIView):
 class create_role(APIView):
     # User validations request.user.is_validuser
     
-    @permission_required("userData.add_rolehierarchy")  
-    # @method_decorator(login_required)  
+    @method_decorator(permission_required("userData.add_rolehierarchy"))
+    @method_decorator(login_required)  
     def post(self,request):
         roleData=request.data  
         serializers=RoleHierarchySerializer(data=roleData)
@@ -95,7 +93,7 @@ def Employees_List(request):
         serializer = EmployeeSerializer(data, many=True)
         
         return Response(serializer.data ,status=status.HTTP_200_OK)
-
+    
     elif request.method == 'POST':
         print(request.data, "usernamee")
         if requestedUser.join_Count <=0 :
