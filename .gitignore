@@ -129,7 +129,7 @@ env.bak/
 venv.bak/
 myenv/
 
-Backend/userData/
+Backend/userData/migrations
 # Spyder project settings
 .spyderproject
 .spyproject
