@@ -129,7 +129,6 @@ env.bak/
 venv.bak/
 myenv/
 
-Backend/userData/migrations
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -167,6 +166,8 @@ cython_debug/
 
 # dependencies
 Frontend/node_modules/
+Backend/userData/migrations/*.py
+Backend/userData/migrations/0001_initial.py
 /.pnp
 .pnp.js
 # testing
