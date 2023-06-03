@@ -138,3 +138,13 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication'
     ],
 }
+
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'your_smtp_host'
+# EMAIL_PORT = your_smtp_port
+# EMAIL_USE_TLS = True  # Use TLS encryption
+# EMAIL_HOST_USER = 'your_email@example.com'
+# EMAIL_HOST_PASSWORD = 'your_email_password'
+# DEFAULT_FROM_EMAIL = 'your_email@example.com'
+
