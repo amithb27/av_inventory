@@ -1,4 +1,7 @@
 from django.shortcuts import  get_object_or_404
+from django.urls import reverse
+import requests
+from django.http import HttpRequest
 from django.contrib.auth import authenticate, login,logout
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -15,18 +18,20 @@ from django.contrib.auth.decorators import permission_required
 def Login(request):
     requestedUser = request.data.username
     password = request.data.password
-    print(requestedUser,password ,"this is the creds")
     user = authenticate(request, username = requestedUser , password = password)   
     if user is not None :
         login(request)
     return Response(data="cannot login with the provided credentials " ,status=status.HTTP_401_UNAUTHORIZED)
+
 @api_view(["GET"])
 def Logout(request):
     logout(request)
     return Response(data={
         "message":"logout success"}, status=status.HTTP_200_OK)
 
-class Create_User(APIView):
+
+
+class Create_User(APIView ):
         @method_decorator(login_required)
         @permission_required("userData.add_user")
         def post(self,request,type):
@@ -36,11 +41,19 @@ class Create_User(APIView):
                 return Response(data={
         "message":"Created User"}, status= status.HTTP_201_CREATED)
             return Response( serializer.errors , status= status.HTTP_400_BAD_REQUEST)
-
-
+        
+        @method_decorator(login_required)
+        @permission_required("userData.change_user")
+        def patch(self ,request ):
+            requested_User = request.user
+            serializer =  UserSerializer(data=request.data , instance=requested_User , context ={"is_Admin":request.user.is_Admin}) 
+            if serializer.is_valid():
+                serializer.save()
+                return Response(data={"message":"Password changed "} ,status=status.HTTP_200_OK)
+            return Response(data=serializer.errors , status=status.HTTP_400_BAD_REQUEST)
+        
 class create_role(APIView):
     # User validations request.user.is_validuser
-    
     @method_decorator(permission_required("userData.add_rolehierarchy"))
     @method_decorator(login_required)  
     def post(self,request):
@@ -71,7 +84,7 @@ class create_role(APIView):
     
     @method_decorator(login_required)
     @method_decorator(permission_required("userData.change_rolehierarchy") )
-    def update(self , request,pk):
+    def put(self , request,pk):
         data = request.data
         instance = RoleHierarchy.objects.get(pk=pk)
         serializer =  RoleHierarchySerializer(instance = instance, data=data )
@@ -85,8 +98,8 @@ class create_role(APIView):
 @permission_required("userData.change_employee")
 def Employees_List(request):
     print(request.session.session_key,"rhiss is session")
-
-    requestedUser = request.user.username
+    print(user.objects.make_random_password())
+    requestedUser = request.user
     if request.method == 'GET':
         data = Employee.objects.all()
 
@@ -95,11 +108,17 @@ def Employees_List(request):
         return Response(serializer.data ,status=status.HTTP_200_OK)
     
     elif request.method == 'POST':
-        print(request.data, "usernamee")
+        res = HttpRequest()
         if requestedUser.join_Count <=0 :
-            serializer = EmployeeSerializer(data=request.data ,context = {"requestedUser" ,requestedUser})
+            serializer = EmployeeSerializer(data=request.data ,context = {"requestedUser" : requestedUser})
             if serializer.is_valid():
-                serializer.save()
+                (pk,email) = serializer.save()
+                is_Web_user = request.data.web_user
+                if is_Web_user :
+                     return requests.post(url=request.build_absolute_uri(reverse(viewname= "Create_User" , kwargs={"type":"user"} )) , data={
+                        "email" :email,
+                        "pk" : pk
+                     })
                 return Response(status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(data = {"error":"You exceeded your count limit "} ,status=status.HTTP_401_UNAUTHORIZED)
@@ -107,9 +126,9 @@ def Employees_List(request):
 @login_required
 @api_view(['PUT', 'DELETE','GET'])
 @permission_required("userData.change_employee")
+
 def Employees_Details(request, pk):
     emp = get_object_or_404(Employee,pk=pk)
-
     if request.method == 'PUT':
         serializer = EmployeeSerializer(emp, data=request.data, context={'request': request})
         if serializer.is_valid():

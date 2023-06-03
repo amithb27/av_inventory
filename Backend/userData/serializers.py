@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import *
 
 
+Employee_Tag ="AV_"
 
 class RoleHierarchySerializer(serializers.ModelSerializer):
     # reporting_role = RoleHierarchySerializer
@@ -49,30 +50,44 @@ class EmployeeSerializer(serializers.ModelSerializer):
         city = validated_data["Adress"]["city"]
         zip_code=validated_data["Adress"]["zip_code"]
         zone=validated_data["Adress"]["zone"]
+        employee_Id = Employee_Tag + str(validated_data.pk)
         print(role,"this is role")
-        my_Adress=Adress.objects.create(city=city,country=country,
+        my_Adress=Address.objects.create(city=city,country=country,
             zip_code=zip_code , zone=zone)
         my_Role=RoleHierarchy.objects.get(name=role)
         my_Employee=Employee.objects.create(name=name, email=email,
                                             phone=phone, reporting_Person=reporting_Person,
                                             created_By=created_By,
-                                            role=my_Role, Adress=my_Adress)
+                                            role=my_Role, Adress=my_Adress ,employee_Id =employee_Id)
         
         current_user.save()
         
-        return my_Employee
+        
+        return ( my_Employee.pk , email )
     
 class UserSerializer(serializers.ModelSerializer):
-       
        class Meta:
            model = user
-           fields = ["username","user_permissions","email","groups","password","firstname","lastname"]
+           fields = ["email",]
        def create(self, validated_data):
+           email = validated_data.email
+           pk = validated_data.pk
+           password = user.objects.make_random_password()
            type = self.context.get("type")
-           myUser = user if type == "user" else Admin
-           createdUser = myUser.objects.create(validated_data)
-           createdUser.is_staff = True
-           createdUser.is_superuser = True 
+           myUser = Admin if type == "Admin" else user
+           createdUser = myUser(email = email )
+           createdUser.set_password(password)
+           employee = Employee.objects.get(pk=pk)
+           createdUser.employee = employee
+           
+           if type == "Admin" :
+                createdUser.is_staff = True
+                createdUser.is_superuser = True 
+           createdUser.save() 
            return createdUser  
        
- 
+       def update(self,instance, validated_data):
+           instance.set_password(validated_data.password)
+           instance.save()
+           
+       
