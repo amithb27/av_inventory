@@ -101,6 +101,8 @@ def Employees_List(request):
     print(user.objects.make_random_password())
     requestedUser = request.user
     if request.method == 'GET':
+        dummy = request.build_absolute_uri(reverse(viewname="user_creator", kwargs={"type":"user"} ))
+        print(dummy)
         data = Employee.objects.all()
 
         serializer = EmployeeSerializer(data, many=True)
@@ -115,7 +117,7 @@ def Employees_List(request):
                 (pk,email) = serializer.save()
                 is_Web_user = request.data.web_user
                 if is_Web_user :
-                     return requests.post(url=request.build_absolute_uri(reverse(viewname= "Create_User" , kwargs={"type":"user"} )) , data={
+                     return requests.post(url=request.build_absolute_uri(reverse(viewname= "user_creator" , kwargs={"type":"user"} )) , data={
                         "email" :email,
                         "pk" : pk
                      })
