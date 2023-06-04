@@ -104,11 +104,8 @@ def Employees_List(request):
         dummy = request.build_absolute_uri(reverse(viewname="user_creator", kwargs={"type":"user"} ))
         print(dummy)
         data = Employee.objects.all()
-
         serializer = EmployeeSerializer(data, many=True)
-        
         return Response(serializer.data ,status=status.HTTP_200_OK)
-    
     elif request.method == 'POST':
         res = HttpRequest()
         if requestedUser.join_Count <=0 :

@@ -192,6 +192,7 @@ class Pincode(models.Model):
     status = models.BooleanField(default=True)
     def __str__(self):
         return self.pincode
+    
 
 class Zone(models.Model):
     country_name = models.ForeignKey(Country, on_delete=models.PROTECT) 
@@ -246,6 +247,7 @@ class Item_Status(models.Model):
     
     def __str__(self):
         return self.item_Status_Name
+
 
 
 class Grade(models.Model):

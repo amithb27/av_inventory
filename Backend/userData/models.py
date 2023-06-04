@@ -34,16 +34,19 @@ class Address(models.Model):
 
 class Employee(models.Model):
     ## This creates a model for a Employee
+
     name = models.CharField(max_length=240)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20)
     is_Active = models.BooleanField(default=True)
-    last_Modified = models.DateTimeField(auto_now=True)
+    joining_Date = models.DateField(blank=True , null=True)
     created_By = models.CharField(max_length=100)
+    modified_Person = models.CharField(max_length=200 ,null=True , blank=True)
     role = models.ForeignKey(RoleHierarchy , on_delete=models.PROTECT ,)
     reporting_Person = models.CharField(max_length=200)
     address = models.ForeignKey(Address,on_delete=models.PROTECT  )
     registration_Date = models.DateField(auto_now_add=True,)
+    last_Modified = models.DateTimeField(auto_now=True)
     employee_Id = models.CharField(max_length=100,)
     web_User = models.BooleanField(default=False)
     
@@ -58,7 +61,7 @@ class user(AbstractUser):
     groups = models.ManyToManyField(Group , related_name="users")
     employee = models.OneToOneField(Employee , on_delete=models.PROTECT  , null=True , blank=True)
     is_Admin = models.BooleanField(default=False)
-    
+    name = models.CharField(max_length=200 ,null=True , blank=True )
     USERNAME_FIELD = "username"  
     REQUIRED_FIELDS=["password","email"]
     def __str__(self):
@@ -69,6 +72,7 @@ class user(AbstractUser):
         
 
 class Admin(AbstractUser):
+    name = models.CharField(max_length=200 ,null=True , blank=True )
     user_permissions = models.ManyToManyField(Permission , related_name="Permited_Admins")
     join_Count = models.IntegerField(default=default_admin_join_Count)
     email = models.EmailField(unique=True,)

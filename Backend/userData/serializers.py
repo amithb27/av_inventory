@@ -39,7 +39,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
         )
     def create(self, validated_data):
         current_user = self.context.get("requestedUser")
-        current_user.join_Count -= 1    
+        
         name=validated_data['name']
         email=validated_data['email']
         role=validated_data['role']['name']
@@ -51,7 +51,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
         zip_code=validated_data["Adress"]["zip_code"]
         zone=validated_data["Adress"]["zone"]
         employee_Id = Employee_Tag + str(validated_data.pk)
-        print(role,"this is role")
+        created_By = current_user.name  
         my_Adress=Address.objects.create(city=city,country=country,
             zip_code=zip_code , zone=zone)
         my_Role=RoleHierarchy.objects.get(name=role)
@@ -59,10 +59,9 @@ class EmployeeSerializer(serializers.ModelSerializer):
                                             phone=phone, reporting_Person=reporting_Person,
                                             created_By=created_By,
                                             role=my_Role, Adress=my_Adress ,employee_Id =employee_Id)
-        
+        if current_user.is_Admin : 
+            current_user.join_Count -= 1 
         current_user.save()
-        
-        
         return ( my_Employee.pk , email )
     
 class UserSerializer(serializers.ModelSerializer):
@@ -79,7 +78,7 @@ class UserSerializer(serializers.ModelSerializer):
            createdUser.set_password(password)
            employee = Employee.objects.get(pk=pk)
            createdUser.employee = employee
-           
+           createdUser.name = employee.name
            if type == "Admin" :
                 createdUser.is_staff = True
                 createdUser.is_superuser = True 
