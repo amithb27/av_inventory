@@ -34,7 +34,6 @@ class Address(models.Model):
 
 class Employee(models.Model):
     ## This creates a model for a Employee
-
     name = models.CharField(max_length=240)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20)
@@ -56,12 +55,12 @@ class Employee(models.Model):
         verbose_name_plural = "Employees"
 
 class user(AbstractUser):
+    name = models.CharField(max_length=200 ,null=True , blank=True )
     user_permissions = models.ManyToManyField(Permission , related_name="Permited_user")
     email = models.EmailField(unique=True,)
     groups = models.ManyToManyField(Group , related_name="users")
     employee = models.OneToOneField(Employee , on_delete=models.PROTECT  , null=True , blank=True)
     is_Admin = models.BooleanField(default=False)
-    name = models.CharField(max_length=200 ,null=True , blank=True )
     USERNAME_FIELD = "username"  
     REQUIRED_FIELDS=["password","email"]
     def __str__(self):
@@ -77,7 +76,6 @@ class Admin(AbstractUser):
     join_Count = models.IntegerField(default=default_admin_join_Count)
     email = models.EmailField(unique=True,)
     groups = models.ManyToManyField(Group , related_name="admins")
-    employee = models.OneToOneField(Employee , on_delete=models.PROTECT ,null=True , blank=True)
     is_Admin = models.BooleanField(default=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS=["password"]

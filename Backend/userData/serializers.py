@@ -39,7 +39,6 @@ class EmployeeSerializer(serializers.ModelSerializer):
         )
     def create(self, validated_data):
         current_user = self.context.get("requestedUser")
-        
         name=validated_data['name']
         email=validated_data['email']
         role=validated_data['role']['name']
@@ -72,18 +71,32 @@ class UserSerializer(serializers.ModelSerializer):
            email = validated_data.email
            pk = validated_data.pk
            password = user.objects.make_random_password()
-           type = self.context.get("type")
-           myUser = Admin if type == "Admin" else user
-           createdUser = myUser(email = email )
+           createdUser = user(email = email )
            createdUser.set_password(password)
            employee = Employee.objects.get(pk=pk)
            createdUser.employee = employee
            createdUser.name = employee.name
-           if type == "Admin" :
-                createdUser.is_staff = True
-                createdUser.is_superuser = True 
            createdUser.save() 
            return createdUser  
+       
+       def update(self,instance, validated_data):
+           instance.set_password(validated_data.password)
+           instance.save()
+           
+           
+class AdminSerializer(serializers.ModelSerializer):
+       class Meta:
+           model = user
+           fields = ["email"]
+       def create(self, validated_data ):
+           email = validated_data.email
+           password = validated_data.password
+           createdAdmin = user(email = email )
+           createdAdmin.set_password(password)
+           createdAdmin.name =validated_data.name
+           createdAdmin.save() 
+           validated_data.user
+           return createdAdmin  
        
        def update(self,instance, validated_data):
            instance.set_password(validated_data.password)

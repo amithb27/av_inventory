@@ -26,5 +26,6 @@ urlpatterns = [
     path('role/<int:pk>', create_role.as_view() , name="reporting_role_callback "),
     path('login/', Login , name="Login "),
     path('logout/', Logout, name="Logout "),
-    path( "user/<str:type> ",Create_User.as_view() ,  name="user_creator")
+    path( "user/ ",Create_User.as_view() ,  name="create_user"),
+    path("admin/" , Create_Admin, name="create_admin")
 ]
