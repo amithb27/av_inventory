@@ -153,3 +153,11 @@ REST_FRAMEWORK = {
 # EMAIL_HOST_PASSWORD = 'your_email_password'
 # DEFAULT_FROM_EMAIL = 'your_email@example.com'
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'pytest.automation123@gmail.com'
+EMAIL_HOST_PASSWORD = 'bvfxpewyizrimqbc'
+EMAIL_PORT = 587
+# DEFAULT_FROM_EMAIL = 'manikantatez@example.com'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False

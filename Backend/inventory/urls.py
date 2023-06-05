@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path 
 from userData.views import *
 urlpatterns = [
+    path("",Template),
     path('admin/', admin.site.urls),
     path("employee/", Employees_List, name="employee_list"),
     path("employee/<int:pk>", Employees_Details, name="employee_list" ),

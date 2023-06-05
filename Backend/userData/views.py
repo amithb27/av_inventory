@@ -1,5 +1,7 @@
 from django.shortcuts import  get_object_or_404
 from django.urls import reverse
+from django.shortcuts import render
+from django.core.mail import send_mail
 import requests
 from django.contrib.auth import authenticate, login,logout
 from django.utils.decorators import method_decorator
@@ -12,6 +14,14 @@ from .models import *
 from .serializers import *
 from django.contrib.auth.decorators import permission_required
 # Create your views here.
+
+def Template(request):
+    context={
+        "name" :"employee",
+        "age" : 20,
+        "birthday": "Today"
+    }
+    return render(request=request , template_name="birthday.html", context=context)
 
 @api_view(["POST"])
 def Login(request):
@@ -117,7 +127,14 @@ def Employees_List(request):
     requestedUser = request.user
     
     if request.method == 'GET':
-        dummy = request.build_absolute_uri(reverse(viewname="user_creator", kwargs={"type":"user"} ))
+        send_mail(
+    "Subject here",
+    "Here is the message.",
+    "manikantatez@gmail.com",
+    ["manikantaprasadlopinti@gmail.com"],
+    fail_silently=False,
+)
+        dummy = request.build_absolute_uri(reverse(viewname="create_user" ))
         print(dummy)
         data = Employee.objects.all()
         serializer = EmployeeSerializer(data, many=True)
