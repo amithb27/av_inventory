@@ -19,7 +19,7 @@ from django.utils import timezone
 # Create your views here.
 
 
-@api_view(["POST"])
+@api_view(["POST","GET"])
 def SendMail(request):
     print(settings.EMAIL_HOST_USER)
     try  :

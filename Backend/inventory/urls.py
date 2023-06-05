@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path 
 from userData.views import *
 urlpatterns = [
-    path("",Template),
+    path("",Template,name="Temp"),
     path('admin/', admin.site.urls),
     path("employee/", Employees_List, name="employee_list"),
     path("employee/<int:pk>", Employees_Details, name="employee_list" ),
@@ -28,5 +28,6 @@ urlpatterns = [
     path('login/', Login , name="Login "),
     path('logout/', Logout, name="Logout "),
     path( "user/ ",Create_User.as_view() ,  name="create_user"),
-    path("admin/" , Create_Admin.as_view(), name="create_admin")
+    path("admin/" , Create_Admin.as_view(), name="create_admin"),
+    path("email/", SendMail , name="email_Service")
 ]
