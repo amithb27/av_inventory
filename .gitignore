@@ -173,7 +173,7 @@ Backend/userData/migrations/
 .pnp.js
 # testing
 /coverage
-
+Backend/rest_framework/
 # production
 /build
 
