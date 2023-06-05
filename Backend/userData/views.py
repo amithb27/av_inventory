@@ -9,9 +9,25 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import status 
 from .models import *
+from django.shortcuts import render , HttpResponse
 from .serializers import *
 from django.contrib.auth.decorators import permission_required
 # Create your views here.
+
+def templateRender(request):
+    name = 'employee'
+    age = 25
+    birthdate = 'May 1st'
+
+    context = {
+        'name': name,
+        'age': age,
+        'birthdate': birthdate
+    }
+    return render(request , template_name="birthday.html" ,context=context)
+
+
+
 
 @api_view(["POST"])
 def Login(request):
