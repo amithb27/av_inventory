@@ -2,7 +2,9 @@ from django.shortcuts import  get_object_or_404
 from django.urls import reverse
 from django.shortcuts import render
 from django.core.mail import send_mail
+from smtplib import SMTPException
 import requests
+from django.conf import settings
 from django.contrib.auth import authenticate, login,logout
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -13,14 +15,38 @@ from rest_framework import status
 from .models import *
 from .serializers import *
 from django.contrib.auth.decorators import permission_required
+from django.utils import timezone
 # Create your views here.
 
+
+@api_view(["POST"])
+def SendMail(request):
+    print(settings.EMAIL_HOST_USER)
+    try  :
+        send_mail(
+    subject ="Email_testing",
+    message= "...Analytics Valley...",
+    from_email=settings.EMAIL_HOST_USER,
+    recipient_list=["manikantatez@gmail.com"],
+    fail_silently=False,
+        ) 
+        return Response(data={
+            "message":"Email sent" 
+        }, status=status.HTTP_200_OK )
+    except  SMTPException  as e:
+        return Response(data={
+            "message":e 
+        }, status=status.HTTP_400_BAD_REQUEST)
+
 def Template(request):
+    my_date = timezone.now()
+    month = my_date.strftime("%B" ) +" - "+ my_date.strftime("%d" )
     context={
         "name" :"employee",
         "age" : 20,
-        "birthday": "Today"
+        "birthdate":month
     }
+    
     return render(request=request , template_name="birthday.html", context=context)
 
 @api_view(["POST"])
@@ -127,13 +153,7 @@ def Employees_List(request):
     requestedUser = request.user
     
     if request.method == 'GET':
-        send_mail(
-    "Subject here",
-    "Here is the message.",
-    "manikantatez@gmail.com",
-    ["manikantaprasadlopinti@gmail.com"],
-    fail_silently=False,
-)
+        
         dummy = request.build_absolute_uri(reverse(viewname="create_user" ))
         print(dummy)
         data = Employee.objects.all()
