@@ -27,5 +27,5 @@ urlpatterns = [
     path('login/', Login , name="Login "),
     path('logout/', Logout, name="Logout "),
     path( "user/ ",Create_User.as_view() ,  name="create_user"),
-    path("admin/" , Create_Admin, name="create_admin")
+    path("admin/" , Create_Admin.as_view(), name="create_admin")
 ]
