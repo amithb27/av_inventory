@@ -2,6 +2,7 @@ from django.shortcuts import  get_object_or_404
 from django.urls import reverse
 from django.shortcuts import render
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from smtplib import SMTPException
 import requests
 from django.conf import settings
@@ -21,9 +22,19 @@ from django.utils import timezone
 
 @api_view(["POST","GET"])
 def SendMail(request):
-    print(settings.EMAIL_HOST_USER)
+    my_date = timezone.now()
+    month = my_date.strftime("%B" ) +" - "+ my_date.strftime("%d" )
+    context={
+        "name" :"employee",
+        "age" : 20,
+        "birthdate":month
+    }
+    template = render_to_string(template_name="birthday.html" ,context=context)
+    
+    print(settings.EMAIL_HOST_USER ,template)
     try  :
         send_mail(
+    html_message=template,
     subject ="Email_testing",
     message= "...Analytics Valley...",
     from_email=settings.EMAIL_HOST_USER,
