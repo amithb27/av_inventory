@@ -23,22 +23,32 @@ from django.utils import timezone
 @api_view(["POST","GET"])
 def SendMail(request):
     my_date = timezone.now()
-    month = my_date.strftime("%B" ) +" - "+ my_date.strftime("%d" )
-    context={
-        "name" :"employee",
-        "age" : 20,
-        "birthdate":month
+    joiningDate = my_date.strftime("%d - %B - %Y")
+    year = my_date.strftime("%Y")
+    birthDayContext={
+        "name" :"Employee",
+        "year" : year
     }
-    template = render_to_string(template_name="birthday.html" ,context=context)
+    aniversaryContext={
+        "name" :"Employee",
+        "year" : year,
+        "workingYears" : 2
+    }
+    logincredsContext={
+        "name" :"Employee",
+        "email"   :"Employee@gmail.com",
+        "password":"*******",
+        "joiningDate" : joiningDate
+    }
+    template = render_to_string(template_name="logincreds.html" ,context=logincredsContext)
     
-    print(settings.EMAIL_HOST_USER ,template)
     try  :
         send_mail(
     html_message=template,
     subject ="Email_testing",
     message= "...Analytics Valley...",
     from_email=settings.EMAIL_HOST_USER,
-    recipient_list=["manikantatez@gmail.com"],
+    recipient_list=["amith.bhonsle@rugua.in","manikantatez@gmail.com"],
     fail_silently=False,
         ) 
         return Response(data={
@@ -51,14 +61,25 @@ def SendMail(request):
 
 def Template(request):
     my_date = timezone.now()
-    month = my_date.strftime("%B" ) +" - "+ my_date.strftime("%d" )
-    context={
-        "name" :"employee",
-        "age" : 20,
-        "birthdate":month
+    joiningDate = my_date.strftime("%d - %B - %Y")
+    year = my_date.strftime("%Y")
+    birthDayContext={
+        "name" :"Employee",
+        "year" : year
+    }
+    aniversaryContext={
+        "name" :"Employee",
+        "year" : year,
+        "workingYears" : 2
+    }
+    logincredsContext={
+        "name" :"Employee",
+        "email"   :"Employee@gmail.com",
+        "password":"*******",
+        "joiningDate" : joiningDate
     }
     
-    return render(request=request , template_name="birthday.html", context=context)
+    return render(request=request , template_name="birthday.html", context=birthDayContext)
 
 @api_view(["POST"])
 def Login(request):
