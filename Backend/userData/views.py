@@ -1,5 +1,6 @@
 from django.shortcuts import  get_object_or_404
 from django.urls import reverse
+import re
 from django.shortcuts import render
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -14,11 +15,46 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import status 
 from .models import *
+from django.contrib.contenttypes.models import ContentType
 from .serializers import *
 from django.contrib.auth.decorators import permission_required
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser,Group , Permission 
 # Create your views here.
 
+class Employee_Permission(APIView):
+    @method_decorator(login_required)
+    @method_decorator(permission_required("userData.view_user"))
+    def get(request):
+        appContent = ContentType.objects.get(app_name = "userData")
+        perms = Permission.objects.filter(contenttype = appContent)
+   
+    @method_decorator(login_required)
+    @method_decorator(permission_required("userData.change_user"))
+    def post(request,pk):
+        data = request.data
+        employee = get_object_or_404(Employee,pk)
+        user = employee.user 
+        user.user_permissions.add()
+
+@login_required()
+@api_view(["POST","GET"])
+# @permission_required(["userData.view_employee"])        
+def MobileProfile(request):
+    user_agent = request.META.get('HTTP_USER_AGENT', '')
+    devices = ['Mobile','Android','iPhone','Tablet','iPad']
+    is_Mobile_User = False
+    for device  in devices:
+        if device in user_agent:
+            is_Mobile_User = True
+    if is_Mobile_User :
+        user = request.user
+        if user.is_Admin == False :
+            emp = user.employee
+            return Response(data={"id":emp.employee_Id} , status=status.HTTP_200_OK)
+        else :
+            return Response(data={"message" : "permission is a admin"} , status=status.HTTP_404_NOT_FOUND)
+    return Response(data={} , status=status.HTTP_204_NO_CONTENT)
 
 @api_view(["POST","GET"])
 def SendMail(request):
@@ -115,7 +151,7 @@ class Create_Admin(APIView):
 
 class Create_User(APIView ):
         @method_decorator(login_required)
-        @permission_required("userData.add_user")
+        @method_decorator(permission_required("userData.add_user"))
         def post(self,request):
             serializer = UserSerializer(data=request.data)
             if serializer.is_valid():
@@ -140,12 +176,14 @@ class create_role(APIView):
     @method_decorator(permission_required("userData.add_rolehierarchy"))
     @method_decorator(login_required)  
     def post(self,request):
-        roleData=request.data  
-        serializers=RoleHierarchySerializer(data=roleData)
-        if serializers.is_valid():
-            serializers.save()
-            return Response (status=status.HTTP_201_CREATED)
-        return Response(data = serializers.errors ,status=status.HTTP_400_BAD_REQUEST)
+        requestedUser = request.user
+        if requestedUser.join_Count > 0 :
+            roleData=request.data  
+            serializers=RoleHierarchySerializer(data=roleData , context = {"user" : requestedUser})
+            if serializers.is_valid():
+                serializers.save()
+                return Response (status=status.HTTP_201_CREATED)
+            return Response(data = serializers.errors ,status=status.HTTP_400_BAD_REQUEST)
     
     
     @method_decorator(login_required)
@@ -185,7 +223,6 @@ def Employees_List(request):
     requestedUser = request.user
     
     if request.method == 'GET':
-        
         dummy = request.build_absolute_uri(reverse(viewname="create_user" ))
         print(dummy)
         data = Employee.objects.all()
@@ -193,18 +230,17 @@ def Employees_List(request):
         return Response(serializer.data ,status=status.HTTP_200_OK)
     
     elif request.method == 'POST':
-        if requestedUser.join_Count <=0 :
-            serializer = EmployeeSerializer(data=request.data ,context = {"requestedUser" : requestedUser})
-            if serializer.is_valid():
-                (pk,email) = serializer.save()
-                is_Web_user = request.data.web_user
-                if is_Web_user :
-                     return requests.post(url=request.build_absolute_uri(reverse(viewname= "create_user" )) , data={
-                        "email" :email,
-                        "pk" : pk
-                     })
-                return Response(status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = EmployeeSerializer(data=request.data ,context = {"requestedUser" : requestedUser})
+        if serializer.is_valid():
+            (pk,email) = serializer.save()
+            is_Web_user = request.data.web_user
+            if is_Web_user :
+                    return requests.post(url=request.build_absolute_uri(reverse(viewname= "create_user" )) , data={
+                    "email" :email,
+                    "pk" : pk
+                    })
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(data = {"error":"You exceeded your count limit "} ,status=status.HTTP_401_UNAUTHORIZED)
 
 @login_required

@@ -1,0 +1,95 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'userData/css/logincreds.css' %}"> 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>Company Name - Welcome Email</title>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+header img {
+    max-width: 200px;
+    margin-bottom: 10px;
+}
+
+h1 {
+    font-size: 24px;
+    margin: 0;
+}
+
+main {
+    margin-bottom: 20px;
+}
+
+ul {
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+footer {
+    text-align: center;
+    font-size: 12px;
+    color: #888888;
+}
+
+</style>
+
+</head>
+
+
+<body>
+    <div class="container">
+        <header>
+            <img src="{% static 'userData/images/Logo.png' %}" alt="Company Logo">
+            <h1>Welcome to Analytics Valley</h1>
+        </header>
+        <main>
+            <p>Dear {{name}},</p>
+            <p>Welcome to Company Name! We are pleased to have you as part of our team.</p>
+            <p>Please find below your login credentials:</p>
+            <ul>
+                <li><strong>Username:</strong> {{email}}</li>
+                <li><strong>Password:</strong> {{password}}</li>
+            </ul>
+            <p>Your joining date is: {{joiningDate}}</p>
+            <p>Please use the provided login credentials to access your employee account and begin your journey with us.</p>
+            <p>If you have any questions or need further assistance, feel free to reach out to our HR department.</p>
+            <p>Thank you and once again, welcome aboard!</p>
+            <p>Sincerely,</p>
+            <p>The Analytics Valley Team</p>
+        </main>
+        <footer>
+            &copy; {{year}} Analytics Valley. All rights reserved.
+        </footer>
+    </div>
+</body>
+
+</html>
+
+       

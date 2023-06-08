@@ -1,0 +1,80 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'userData/css/aniversary.css' %}"> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Work Anniversary</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style>
+    body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    display: block;
+    margin: 0 auto;
+    width: 200px;
+    height: auto;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+p {
+    text-align: center;
+    color: #555;
+}
+
+.bold {
+    text-align: center;
+    color: #555;
+    font-weight: bold;
+}
+
+.small {
+    text-align: center;
+    color: #777;
+    font-size: 12px;
+}
+.footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 12px;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{% static 'userData/images/Logo.png' %}" alt="Company Logo" class="logo">
+        <h1>Happy Work Anniversary!</h1>
+        <p>Dear {{name}},</p>
+        <p>Congratulations on completing {{workingYears}} years at Analytics Valley ! We would like to take this opportunity to express our appreciation for your hard work, dedication, and contributions to the company.</p>
+        <p>Your commitment and loyalty have been instrumental in our success. We value your expertise, professionalism, and positive attitude.</p>
+        <p>We look forward to many more years of working together and achieving new milestones. Thank you for your continued efforts and commitment to excellence.</p>
+        <p>Once again, happy work anniversary!</p>
+        <p>Best regards,</p>
+        <p class="bold">Amith Bhonsle</p>
+        <p class="small">Ceo</p>
+        <p class="small">Analytics Valley</p>
+    <div class="footer">
+            &copy; {{year}} Analytics Valley. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>
+
+       

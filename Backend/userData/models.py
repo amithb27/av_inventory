@@ -1,5 +1,4 @@
 from .deaultValues import *
-
 from django.db import models
 from django.contrib.auth.models import AbstractUser,Group , Permission 
 from treebeard.mp_tree import MP_Node
@@ -54,12 +53,13 @@ class Employee(models.Model):
     class Meta:  
         verbose_name_plural = "Employees"
 
+
 class user(AbstractUser):
     name = models.CharField(max_length=200 ,null=True , blank=True )
     user_permissions = models.ManyToManyField(Permission , related_name="Permited_user")
     email = models.EmailField(unique=True,)
     groups = models.ManyToManyField(Group , related_name="users")
-    employee = models.OneToOneField(Employee , on_delete=models.PROTECT  , null=True , blank=True)
+    employee = models.OneToOneField(Employee , on_delete=models.PROTECT  , null=True , blank=True , related_name="user")
     is_Admin = models.BooleanField(default=False)
     USERNAME_FIELD = "username"  
     REQUIRED_FIELDS=["password","email"]

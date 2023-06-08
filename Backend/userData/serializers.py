@@ -11,8 +11,10 @@ class RoleHierarchySerializer(serializers.ModelSerializer):
         fields = ( 'role',"reporting_role")
         
         def create(self, validated_data):
+            user = self.context.get("user")
             Group.objects.create(name=validated_data.name)
             root=RoleHierarchy.add_root(role = validated_data.name )
+            user.join_Count -= 1 
 
         def update(self,instance, validated_data):
             instance.role = validated_data.name
@@ -37,6 +39,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
                   'status','reporting_Person','registration_Date',
                   "created_By",
         )
+        
     def create(self, validated_data):
         current_user = self.context.get("requestedUser")
         name=validated_data['name']
@@ -58,9 +61,6 @@ class EmployeeSerializer(serializers.ModelSerializer):
                                             phone=phone, reporting_Person=reporting_Person,
                                             created_By=created_By,
                                             role=my_Role, Adress=my_Adress ,employee_Id =employee_Id)
-        if current_user.is_Admin : 
-            current_user.join_Count -= 1 
-        current_user.save()
         return ( my_Employee.pk , email )
     
 class UserSerializer(serializers.ModelSerializer):
