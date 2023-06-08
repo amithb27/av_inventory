@@ -35,6 +35,7 @@ class Employee(models.Model):
     ## This creates a model for a Employee
     name = models.CharField(max_length=240)
     email = models.EmailField(unique=True)
+    birthdate = models.DateField(null=True , blank=True)
     phone = models.CharField(max_length=20)
     is_Active = models.BooleanField(default=True)
     joining_Date = models.DateField(blank=True , null=True)

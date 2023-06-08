@@ -30,7 +30,7 @@ urlpatterns = [
     path('logout/', Logout, name="Logout "),
     path( "user/ ",Create_User.as_view() ,  name="create_user"),
     path("admin/" , Create_Admin.as_view(), name="create_admin"),
-    path("email/", SendMail , name="email_Service"),
+    path("email/<int:pk>", SendMail , name="email_Service"),
     path("permissions/<int:pk>",Employee_Permission.as_view() ,name="permission"),
     path("profile/",MobileProfile,name="profile")
 ]

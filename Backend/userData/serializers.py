@@ -77,7 +77,12 @@ class UserSerializer(serializers.ModelSerializer):
            createdUser.employee = employee
            createdUser.name = employee.name
            createdUser.save() 
-           return createdUser  
+           returned_Object = {
+               "email":email,
+               "password":password,
+               "pk":pk               
+           }
+           return returned_Object  
        
        def update(self,instance, validated_data):
            instance.set_password(validated_data.password)

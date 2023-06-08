@@ -90,3 +90,9 @@ cmd (zsh) : python3 manage.py migrate
 #### step7 start the django server
 
 cmd (zsh) : python3 manage.py runserver
+
+
+to start a  celery worker :
+    celery -A <your_project_name> worker --loglevel=info
+to start a  celery beat:
+    celery -A <your_project_name> beat --loglevel=info

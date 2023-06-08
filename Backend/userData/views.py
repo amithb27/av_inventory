@@ -1,6 +1,5 @@
 from django.shortcuts import  get_object_or_404
 from django.urls import reverse
-import re
 from django.shortcuts import render
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -56,25 +55,18 @@ def MobileProfile(request):
             return Response(data={"message" : "permission is a admin"} , status=status.HTTP_404_NOT_FOUND)
     return Response(data={} , status=status.HTTP_204_NO_CONTENT)
 
-@api_view(["POST","GET"])
-def SendMail(request):
+
+def SendMail(request,pk):
+    data = request.data
     my_date = timezone.now()
-    joiningDate = my_date.strftime("%d - %B - %Y")
+    emp= get_object_or_404(Employee,pk=pk)
     year = my_date.strftime("%Y")
-    birthDayContext={
-        "name" :"Employee",
-        "year" : year
-    }
-    aniversaryContext={
-        "name" :"Employee",
-        "year" : year,
-        "workingYears" : 2
-    }
     logincredsContext={
-        "name" :"Employee",
-        "email"   :"Employee@gmail.com",
-        "password":"*******",
-        "joiningDate" : joiningDate
+        "name" :emp.name,
+        "email"   :data.email,
+        "password":data.password,
+        "joiningDate" : emp.joining_Date,
+        "year" : year
     }
     template = render_to_string(template_name="logincreds.html" ,context=logincredsContext)
     
@@ -95,6 +87,8 @@ def SendMail(request):
             "message":e 
         }, status=status.HTTP_400_BAD_REQUEST)
 
+
+# this view is for just to see the templates ...
 def Template(request):
     my_date = timezone.now()
     joiningDate = my_date.strftime("%d - %B - %Y")
@@ -142,7 +136,6 @@ class Create_Admin(APIView):
                 if  admin.join_Count == 0 :
                     return Response(data={"message":"Admin Limit exceeded"} , status=status.HTTP_403_FORBIDDEN)
                 serializer.save()
-
                 admin.join_Count -=1
                 return Response(data={
         "message":"Created Admin"}, status= status.HTTP_201_CREATED)
@@ -155,9 +148,8 @@ class Create_User(APIView ):
         def post(self,request):
             serializer = UserSerializer(data=request.data)
             if serializer.is_valid():
-                serializer.save()
-                return Response(data={
-        "message":"Created User"}, status= status.HTTP_201_CREATED)
+                data_Object = serializer.save()
+                return requests.post(url=request.build_absolute_uri(reverse(viewname= "email_Service" , args=(data_Object.pk) )), data=data_Object)
             return Response( serializer.errors , status= status.HTTP_400_BAD_REQUEST)
         
         @method_decorator(login_required)
@@ -182,7 +174,7 @@ class create_role(APIView):
             serializers=RoleHierarchySerializer(data=roleData , context = {"user" : requestedUser})
             if serializers.is_valid():
                 serializers.save()
-                return Response (status=status.HTTP_201_CREATED)
+                return Response(data={"message":"created"} , status=status.HTTP_201_CREATED)
             return Response(data = serializers.errors ,status=status.HTTP_400_BAD_REQUEST)
     
     
@@ -239,9 +231,9 @@ def Employees_List(request):
                     "email" :email,
                     "pk" : pk
                     })
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(data = {"error":"You exceeded your count limit "} ,status=status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(data = {"error":"You exceeded your count limit "} ,status=status.HTTP_401_UNAUTHORIZED)
+
 
 @login_required
 @api_view(['PUT', 'DELETE','GET'])

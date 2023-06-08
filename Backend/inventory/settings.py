@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
 from pathlib import Path
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -161,3 +162,26 @@ EMAIL_PORT = 587
 # DEFAULT_FROM_EMAIL = 'manikantatez@example.com'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
+
+
+
+# settings.py
+
+# ...
+
+CELERY_BEAT_SCHEDULE = {
+    'task1': {
+        'task': "userData.tasks.AniversayMail",
+        'schedule': crontab(minute=0, hour=10),  
+    },
+    'task2': {
+        'task': "userData.tasks.BirthdayMail",
+        'schedule': crontab(minute=0, hour=10), 
+    },
+    'task3' :{
+        'task':'userData.tasks.add',
+        'schedule':10,
+    }
+}
+
+
