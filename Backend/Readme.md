@@ -92,7 +92,56 @@ cmd (zsh) : python3 manage.py migrate
 cmd (zsh) : python3 manage.py runserver
 
 
-to start a  celery worker :
-    celery -A <your_project_name> worker --loglevel=info
-to start a  celery beat:
+
+
+
+# installation of celery module for PERIODIC TASK SCHEDULE
+
+The celery works on a parllel thread of our django project
+
+Celery runs our tasks .. but it needs a massage manager(Kombu) it comes with the celery package it self 
+
+The Flow chat of the periodic task managing ----->
+
+celery client (our django project where tasks are created)
+
+Message broker (where task messsages are queued  )
+
+celery worker (where the task are proccesed and executed)
+
+celery beat (triggers a celery worker as per given schedule to execute a task )
+
+### To run celery periodic task, we require Three servers run at a time other then django server.
+### server1 : RabbitMQ Server  ( Message broker)
+
+--->  we need to install it before using celery worker
+--->  install RabbitMq with the homebrew
+#### step1 : start vertual environment :
+#### step2 :  install RabbitMQ
+        cmd (zsh): brew update 
+        cmd (zsh) : brew install rabbitmq
+        cmd (zsh) : brew services start rabbitmq
+
+
+after installing go to this default url --> http://localhost:15672/
+
+Login to the site :
+            username : guest
+            password : guest 
+
+    the celery only works if the massage broker server is running 
+
+    Tip : dont forget to stop the  RabbitMq Server  after you         finished your work  to avoid battery drainage 
+
+    cmd(zsh) : brew services stop rabbitmq
+
+## Server2 : Celery Worker (execute The tasks)
+
+to start  a  celery worker :
+   cmd(zsh): celery -A <project_name> worker --loglevel=info
+
+## Server3 : Celery Beat (Schedule the tasks )
+to start a  celery beat :
     celery -A <your_project_name> beat --loglevel=info
+
+
