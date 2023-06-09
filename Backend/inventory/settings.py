@@ -180,8 +180,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'task3' :{
         'task':'userData.tasks.add',
-        'schedule':10,
+        'schedule':4,
     }
 }
-
 
