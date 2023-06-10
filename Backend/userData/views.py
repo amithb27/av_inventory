@@ -38,8 +38,26 @@ class Employee_Permission(APIView):
 
 @login_required()
 @api_view(["POST","GET"])
-# @permission_required(["userData.view_employee"])        
+@permission_required(["userData.view_employee"])        
 def MobileProfile(request):
+    """
+    Retrieves the mobile profile for an authenticated user.
+
+    This view function checks if the user is accessing the profile from a mobile device based on the user agent.
+    And sends Back the employee Id
+
+    Returns:
+        - If the user is on a mobile device and not an admin:
+            - JSON response with the employee ID: {"id": employee_id}
+            - Status code: 200 (OK)
+        - If the user is an admin:
+            - JSON response with a "permission denied" message: {"message": "permission is an admin"}
+            - Status code: 404 (Not Found)
+        - If the user is not on a mobile device:
+            - Empty JSON response
+            - Status code: 204 (No Content)
+    """
+    
     user_agent = request.META.get('HTTP_USER_AGENT', '')
     devices = ['Mobile','Android','iPhone','Tablet','iPad']
     is_Mobile_User = False
@@ -57,6 +75,26 @@ def MobileProfile(request):
 
 
 def SendMail(request,pk):
+    """
+    Sends an email with login credentials to an employee.
+
+    This view function receives a POST request with the email and password data. 
+    And sends an Email with login credentials
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        pk (int): The primary key of the employee.
+
+    Returns:
+        - If the email is sent successfully:
+            - JSON response with a success message: {"message": "Email sent"}
+            - Status code: 200 (OK)
+        - If there is an error sending the email:
+            - JSON response with an error message: {"message": <error_message>}
+            - Status code: 400 (Bad Request)
+    """
+    
+    
     data = request.data
     my_date = timezone.now()
     emp= get_object_or_404(Employee,pk=pk)
@@ -113,6 +151,21 @@ def Template(request):
 
 @api_view(["POST"])
 def Login(request):
+       
+    # Logs in a user with the provided credentials.
+
+    # Args:
+    #     request (HttpRequest): The HTTP request object.
+
+    # Returns:
+    #     - If the authentication is successful:
+    #         - Empty response
+    #         - Status code: 200 (OK)
+    #     - If the authentication fails:
+    #         - JSON response with an error message: "cannot login with the provided credentials"
+    #         - Status code: 401 (Unauthorized)
+    
+    
     requestedUser = request.data.username
     password = request.data.password
     user = authenticate(request, username = requestedUser , password = password)   
@@ -122,14 +175,43 @@ def Login(request):
 
 @api_view(["GET"])
 def Logout(request):
+    
+    
+    # Logs out the currently authenticated user.
+
+    # Args:
+    #     request (HttpRequest): The HTTP request object.
+
+    # Returns:
+    #     - JSON response with a success message: "logout success"
+    #     - Status code: 200 (OK)
+ 
     logout(request)
     return Response(data={
         "message":"logout success"}, status=status.HTTP_200_OK)
 
 class Create_Admin(APIView):
+    #  API view to create a new admin user.
+    
         @method_decorator(login_required)
         @permission_required("userData.add_admin")
         def post(self,request): 
+               
+        # Handles the POST request to create a new admin user.
+
+
+        # Args:
+        #     request (HttpRequest): The HTTP request object.
+
+        # Returns:
+        #     - JSON response with a success message: "Created Admin"
+        #     - Status code: 201 (Created)
+        #     - JSON response with validation errors
+        #     - Status code: 400 (Bad Request)
+        #     - JSON response with an error message: "Admin Limit exceeded"
+        #     - Status code: 403 (Forbidden)
+       
+
             serializer = AdminSerializer(data=request.data )
             if serializer.is_valid():
                 admin = request.user
@@ -143,9 +225,25 @@ class Create_Admin(APIView):
 
 
 class Create_User(APIView ):
+    
+    #    API view to create a new user and update user password.
+    
         @method_decorator(login_required)
         @method_decorator(permission_required("userData.add_user"))
         def post(self,request):
+            
+            # Handles the POST request to create a new user.
+            
+            # Args:
+            #     request (HttpRequest): The HTTP request object.
+
+            # Returns:
+            #     - JSON response from the email service API
+            #     - Status code: 200 (OK)
+            #     - JSON response with validation errors
+            #     - Status code: 400 (Bad Request)
+         
+         
             serializer = UserSerializer(data=request.data)
             if serializer.is_valid():
                 data_Object = serializer.save()
@@ -155,6 +253,16 @@ class Create_User(APIView ):
         @method_decorator(login_required)
         @permission_required("userData.change_user")
         def patch(self ,request ):
+            # Handles the PATCH request to update the user password.
+            
+            # Args:
+            #     request (HttpRequest): The HTTP request object.
+
+            # Returns:
+            #     - JSON response with a success message: "Password changed"
+            #     - Status code: 200 (OK)
+            #     - JSON response with validation errors
+            #     - Status code: 400 (Bad Request)
             requested_User = request.user
             serializer =  UserSerializer(data=request.data , instance=requested_User ) 
             if serializer.is_valid():
@@ -164,10 +272,26 @@ class Create_User(APIView ):
         
 
 class create_role(APIView):
-    # User validations request.user.is_validuser
+    
+    #    API view to create, retrieve, update roles.
+    
+    
+     
     @method_decorator(permission_required("userData.add_rolehierarchy"))
     @method_decorator(login_required)  
     def post(self,request):
+        
+        # Handles the POST request to create a new role.
+        
+        # Args:
+        #     request (HttpRequest): The HTTP request object.
+
+        # Returns:
+        #     - JSON response with a success message: "created"
+        #     - Status code: 201 (Created)
+        #     - JSON response with validation errors
+        #     - Status code: 400 (Bad Request)
+        
         requestedUser = request.user
         if requestedUser.join_Count > 0 :
             roleData=request.data  
@@ -181,6 +305,18 @@ class create_role(APIView):
     @method_decorator(login_required)
     @method_decorator(permission_required("userData.view_rolehierarchy")) 
     def get(self,request,role):
+        
+        # Handles the GET request to retrieve a specific Role with role name.
+
+        # Args:
+        #     request (HttpRequest): The HTTP request object.
+        #     role (str, optional): The name of the role to retrieve its ancestors. Defaults to None.
+
+        # Returns:
+        #     - JSON response with serialized data of the available roles or ancestors
+        #     - Status code: 200 (OK)
+        
+        
         role_object =get_object_or_404(RoleHierarchy, name=role)    
         available_reporting_roles = role_object.get_ancestors()
         serializer = RoleHierarchySerializer(available_reporting_roles , )
@@ -190,6 +326,16 @@ class create_role(APIView):
     @method_decorator(login_required)
     @method_decorator(permission_required("userData.view_rolehierarchy"))
     def get(self,request): 
+        # Handles the GET request to retrieve all Roles.
+
+        # Args:
+        #     request (HttpRequest): The HTTP request object.
+        #     role (str, optional): The name of the role to retrieve its ancestors. Defaults to None.
+
+        # Returns:
+        #     - JSON response with serialized data of the available roles or ancestors
+        #     - Status code: 200 (OK)
+        
         available_roles = RoleHierarchy.objects.all()
         print(available_roles)
         serializedData = RoleHierarchySerializer(available_roles , many=True)
@@ -198,6 +344,21 @@ class create_role(APIView):
     @method_decorator(login_required)
     @method_decorator(permission_required("userData.change_rolehierarchy") )
     def put(self , request,pk):
+        
+        """
+        Handles the PUT request to update a role.
+        
+        Args:
+            request (HttpRequest): The HTTP request object.
+            pk (int): The primary key of the role to update.
+
+        Returns:
+            - JSON response with the updated role data
+            - Status code: 200 (OK)
+            - JSON response with validation errors
+            - Status code: 400 (Bad Request)
+        """
+
         data = request.data
         instance = RoleHierarchy.objects.get(pk=pk)
         serializer =  RoleHierarchySerializer(instance = instance, data=data )
@@ -238,20 +399,62 @@ def Employees_List(request):
 @login_required
 @api_view(['PUT', 'DELETE','GET'])
 @permission_required("userData.change_employee")
-
 def Employees_Details(request, pk):
+    #API view to retrieve, update, or delete an employee.
+    # Args:
+    #     request (HttpRequest): The HTTP request object.
+    #     pk (int): The employee ID.
+
+    # Returns:
+    #     Response: The HTTP response containing the serialized employee data or a success/error message.
+
+    
     emp = get_object_or_404(Employee,pk=pk)
     if request.method == 'PUT':
+        
+        """
+        Handles the PUT request to update a employee.
+        
+        Args:
+            request (HttpRequest): The HTTP request object.
+            pk (int): The primary key of the employee to update.
+
+        Returns:
+            - Status code: 200 (OK)
+            - JSON response with validation errors
+            - Status code: 400 (Bad Request)
+        """
         serializer = EmployeeSerializer(emp, data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     elif request.method == 'DELETE':
+        """
+        Handles the DELETE request to Remove a employee.
+        
+        Args:
+            request (HttpRequest): The HTTP request object.
+            pk (int): The primary key of the employee to update.
+
+        Returns:
+            - Status code: 200 (OK)
+            - JSON response with validation errors
+            - Status code: 400 (Bad Request)
+        """
         emp.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     elif request.method == 'GET':
+        # Handles the GET request to retrieve allEmployess.
+
+        # Args:
+        #     request (HttpRequest): The HTTP request object.
+
+        # Returns:
+        #     - JSON response with serialized data of the available Employess
+        #     - Status code: 200 (OK)
+        
         data=EmployeeSerializer(emp)
         return Response(data.data , status=status.HTTP_302_FOUND)

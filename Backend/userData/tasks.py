@@ -7,12 +7,25 @@ from userData.models import Employee
 from celery import shared_task
 
 
-def MailSender(template, to_Person):
+def MailSender(template, to_Person ,subject , message):
+    
+    """
+    Sends an email using the Django send_mail function.
+    
+    Args:
+        template (str): The HTML content of the email template.
+        to_Person (str): email address of the recipients.
+        subject(str): subject of email
+        message(str): message of the email
+    Returns:
+        None
+        
+    """
     
     send_mail(
     html_message=template,
-    subject ="Email_testing",
-    message= "...Analytics Valley...",
+    subject =subject,
+    message= message,
     from_email=settings.EMAIL_HOST_USER,
     recipient_list=to_Person,
     fail_silently=False,
@@ -27,9 +40,17 @@ def add():
     k= show()
     return k
     
-    
 @shared_task
 def BirthdayMail():
+    
+    # Sends birthday emails to employees whose birthdays are today.
+    # This function triggers autometically @10AM every day
+    # Args:
+    #     None
+
+    # Returns:
+    #     None
+    
     today_Date = timezone.now()
     current_Year = int(today_Date.strftime("%Y"))
     month =int(today_Date.strftime("%m"))
@@ -42,10 +63,18 @@ def BirthdayMail():
                     "year" : current_Year
                 }
                 template = render_to_string(template_name="birthday.html",context=birthDayContext)
-                MailSender(template,emp.email)
+                MailSender(template,emp.email,subject="",message="")
 
 @shared_task
 def AniversayMail():
+      
+    # Sends anniversary emails to employees whose joining date matches the current date.
+    # This function triggers autometically @10AM every day
+    #Args :
+            #None
+    # Returns:
+            # None
+   
     today_Date = timezone.now()
     current_Year = int(today_Date.strftime("%Y"))
     month =int(today_Date.strftime("%m"))
@@ -59,7 +88,8 @@ def AniversayMail():
                     "year" : current_Year,
                     "workingYears" : working_Years 
                 }
-                template = render_to_string(template_name="aniversary.html",context=aniversaryContext)
+                
+                template = render_to_string(template_name="aniversary.html",context=aniversaryContext , subject="",message="")
                 MailSender(template,emp.email)
 
     
