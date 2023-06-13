@@ -12,7 +12,7 @@
 
     if you are not installed then download and install 
 
-  go to here 👉👉   [python](https://www.python.org/downloads/macos/)
+  go to here 👉👉    https://www.python.org/downloads/macos/
     
 
 #### step2 install pip using get-pip.py.
@@ -22,7 +22,7 @@
 
     if you are not installed then run these commands on terminal 
 
-    cmd (zsh): curl [pip-installer](https://bootstrap.pypa.io/get-pip.py -o get-pippy). 
+    cmd (zsh): curl https://bootstrap.pypa.io/get-pip.py -o get-pippy. 
 
     cmd (zsh): sudo python get-pip.py. 
 
@@ -44,7 +44,7 @@ cmd (zsh): pip install -r requirements.txt
 
  if you are not installed <mysql> then download and install
 
- go to here 👉👉 [mysql](https://dev.mysql.com/downloads/mysql/ )
+ go to here 👉👉  https://dev.mysql.com/downloads/mysql/ 
   
     cmd (zsh) : mysql -u root -p
 
@@ -93,9 +93,9 @@ cmd (zsh) : python3 manage.py runserver
 
 
 
-## installation of celery module for PERIODIC TASK SCHEDULE
 
-###### reference -[Reference Vedio](https://youtu.be/fBfzE0yk97k)
+
+# installation of celery module for PERIODIC TASK SCHEDULE
 
 The celery works on a parllel thread of our django project
 
@@ -111,7 +111,7 @@ celery worker (where the task are proccesed and executed)
 
 celery beat (triggers a celery worker as per given schedule to execute a task )
 
-#### To run celery periodic task, we require Three servers run at a time other then django server.
+### To run celery periodic task, we require Three servers run at a time other then django server.
 ### server1 : RabbitMQ Server  ( Message broker)
 
 --->  we need to install it before using celery worker
@@ -122,7 +122,8 @@ celery beat (triggers a celery worker as per given schedule to execute a task )
         cmd (zsh) : brew install rabbitmq
         cmd (zsh) : brew services start rabbitmq
 
-after installing go to this default url -->[url](http://localhost:15672/)
+
+after installing go to this default url --> http://localhost:15672/
 
 Login to the site :
             username : guest
@@ -134,27 +135,13 @@ Login to the site :
 
     cmd(zsh) : brew services stop rabbitmq
 
-#### Server2 : Celery Worker (execute The tasks)
+## Server2 : Celery Worker (execute The tasks)
 
 to start  a  celery worker :
    cmd(zsh): celery -A <project_name> worker --loglevel=info
 
-#### Server3 : Celery Beat (Schedule the tasks )
+## Server3 : Celery Beat (Schedule the tasks )
 to start a  celery beat :
     celery -A <your_project_name> beat --loglevel=info
 
 
-
-## Setup of STMP Server for Mail 
-
-#### step1 : Check for certifi pip package
-    This Package comes with the requirements.txt 
-
-#### step2 : Run the email_utilities.py file in terminal 
-    This is to Upgrade the necessary SSL certifactes in python
-    go to email_Utilites  and Run This Code
-    👉 [email_utilities](userData/email_Utilites.py)
-
-
-
-   

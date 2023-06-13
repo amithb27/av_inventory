@@ -35,8 +35,7 @@ class Employee_Permission(APIView):
         employee = get_object_or_404(Employee,pk)
         user = employee.user 
         user.user_permissions.add()
-        
-        
+
 @login_required()
 @api_view(["POST","GET"])
 @permission_required(["userData.view_employee"])        
@@ -254,7 +253,6 @@ class Create_User(APIView ):
         @method_decorator(login_required)
         @permission_required("userData.change_user")
         def patch(self ,request ):
-            
             # Handles the PATCH request to update the user password.
             
             # Args:
@@ -265,7 +263,6 @@ class Create_User(APIView ):
             #     - Status code: 200 (OK)
             #     - JSON response with validation errors
             #     - Status code: 400 (Bad Request)
-            
             requested_User = request.user
             serializer =  UserSerializer(data=request.data , instance=requested_User ) 
             if serializer.is_valid():
