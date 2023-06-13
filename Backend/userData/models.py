@@ -37,7 +37,6 @@ class Address(models.Model):
     #     zone: The zone of the address.
 
 
-
     country = models.CharField(max_length=100)
     city = models.CharField(max_length=64)
     state = models.CharField(max_length=64)
@@ -49,7 +48,7 @@ class Address(models.Model):
     
     class Meta:
         verbose_name_plural = "addresses"       
-
+        
 
 class Employee(models.Model):
     

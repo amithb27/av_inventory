@@ -63,7 +63,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
                   'status','reporting_Person','registration_Date',
                   "created_By",
         )
-        
+
     def create(self, validated_data):
                
         #Create an Employee instance.
@@ -80,7 +80,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
         role=validated_data['role']['name']
         phone=validated_data['phone']
         reporting_Person=validated_data["reporting_Person"]
-        created_By = validated_data["created_By"]
+        # created_By = validated_data["created_By"]
         country=validated_data["Adress"]["country"]
         city = validated_data["Adress"]["city"]
         zip_code=validated_data["Adress"]["zip_code"]
@@ -155,6 +155,8 @@ class AdminSerializer(serializers.ModelSerializer):
            createdAdmin = user(email = email )
            createdAdmin.set_password(password)
            createdAdmin.name =validated_data.name
+           createdAdmin.is_staff = True
+           createdAdmin.is_superuser = True
            createdAdmin.save() 
            validated_data.user
            return createdAdmin  
@@ -172,5 +174,3 @@ class AdminSerializer(serializers.ModelSerializer):
             
            instance.set_password(validated_data.password)
            instance.save()
-           
-       

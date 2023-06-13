@@ -28,10 +28,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',
+# CORS_ORIGIN_WHITELIST = [
+#     'http://localhost:3000',
 
-]
+# ]
 # Application definition
 
 INSTALLED_APPS = [
@@ -162,7 +162,6 @@ EMAIL_PORT = 587
 # DEFAULT_FROM_EMAIL = 'manikantatez@example.com'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-
 
 
 # settings.py
