@@ -1,12 +1,28 @@
 from rest_framework import serializers
 from .models import *
-
+from rest_framework import status 
 Employee_Tag ="AV_"
+
+
+class RoleSerializer(serializers.ModelSerializer):
+    
+    class Meta :
+        model = Role
+        fields = ["name"]
+    def create(self, validated_data):
+        name = validated_data["name"]
+        role = Role.objects.create(name= name )
+        return role
+    def update(self, instance, validated_data):
+        instance.name = validated_data["name"]
+        instance.save()
+        return instance
+
 
 class RoleHierarchySerializer(serializers.ModelSerializer):
     class Meta:
         model = RoleHierarchy
-        fields = ( 'role',"reporting_role")
+        fields = ('role',"reporting_role")
         
         def create(self, validated_data):
             
@@ -16,12 +32,22 @@ class RoleHierarchySerializer(serializers.ModelSerializer):
                 #validated_data (dict): Validated data containing the role hierarchy information.
 
             #Returns:
-                #None
-                
+                #data (dict) : message as a key 
+            
             user = self.context.get("user")
-            Group.objects.create(name=validated_data.name)
-            root=RoleHierarchy.add_root(role = validated_data.name )
+            role = validated_data.role
+            reporting_role = validated_data.reporting_role
+            # Group.objects.create(name=validated_data.name )
+            if reporting_role == "self":
+                 root = RoleHierarchy.add_root(role = role , reporting_role = "self")
+            else:
+                try :
+                    parent = RoleHierarchy.objects.get(role = reporting_role)
+                    parent.add_child(role = role , reporting_role = reporting_role)
+                except Exception as e :
+                    return {"message" : "create reporting role First " , "status":status.HTTP_400_BAD_REQUEST}
             user.join_Count -= 1 
+            return ({"message":"role Created" , "status":status.HTTP_200_OK})
 
         def update(self,instance, validated_data):
             
@@ -30,15 +56,20 @@ class RoleHierarchySerializer(serializers.ModelSerializer):
             #Args:
                 #instance: Existing RoleHierarchy instance to be updated.
                 #validated_data (dict): Validated data containing the updated role hierarchy information.
-
-            #Returns:
+ 
+            #Returns: 
                 #None
-                
-            instance.role = validated_data.name
-            if instance.reporting_role != validated_data.reporting_role :
+            
+            instance.role = validated_data.role
+            instance.reporting_role = validated_data.reporting_role
+            if instance.reporting_role != "self" :
                 parent = RoleHierarchy.objects.get(reporting_role =validated_data.reporting_role )
                 instance.move(parent,pos="last_child")
+            else :
+                instance.move(target = None)
             instance.save()
+            return  ({"message":"role Updated"})
+            
 
 class AdressSerializer(serializers.ModelSerializer):
     #serializes The Adress model
@@ -60,8 +91,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee 
         fields = ('pk', 'name','email','role','phone','address',
-                  'status','reporting_Person','registration_Date',
-                  "created_By",
+                  'reporting_Person'
         )
         
     def create(self, validated_data):
@@ -77,23 +107,22 @@ class EmployeeSerializer(serializers.ModelSerializer):
         current_user = self.context.get("requestedUser")
         name=validated_data['name']
         email=validated_data['email']
-        role=validated_data['role']['name']
+        role=validated_data['role']['role']
         phone=validated_data['phone']
         reporting_Person=validated_data["reporting_Person"]
-        created_By = validated_data["created_By"]
-        country=validated_data["Adress"]["country"]
-        city = validated_data["Adress"]["city"]
-        zip_code=validated_data["Adress"]["zip_code"]
-        zone=validated_data["Adress"]["zone"]
-        employee_Id = Employee_Tag + str(validated_data.pk)
-        created_By = current_user.name  
+        country=validated_data["address"]["country"]
+        city = validated_data["address"]["city"]
+        zip_code=validated_data["address"]["zip_Code"]
+        zone=validated_data["address"]["zone"]
+        employee_Id = Employee_Tag + str(1)
+        created_By = current_user.username  
         my_Adress=Address.objects.create(city=city,country=country,
-            zip_code=zip_code , zone=zone)
-        my_Role=RoleHierarchy.objects.get(name=role)
+            zip_Code=zip_code , zone=zone)
+        my_Role=RoleHierarchy.objects.get(role=role)
         my_Employee=Employee.objects.create(name=name, email=email,
                                             phone=phone, reporting_Person=reporting_Person,
                                             created_By=created_By,
-                                            role=my_Role, Adress=my_Adress ,employee_Id =employee_Id)
+                                            role=my_Role, address=my_Adress ,employee_Id =employee_Id)
         return ( my_Employee.pk , email )
     
 class UserSerializer(serializers.ModelSerializer):

@@ -6,7 +6,6 @@ from django.contrib.contenttypes.models import ContentType
 
 # Create your models here.
 
-
 class RoleHierarchy(MP_Node):
       
     #Model representing the role hierarchy.
@@ -16,28 +15,37 @@ class RoleHierarchy(MP_Node):
         #role_Created: The datetime when the role was created.
         #role_Modified: The datetime when the role was last modified.
         #reporting_role: The reporting role (foreign key to another RoleHierarchy instance).
-    
+          
       role = models.CharField(max_length=100 , unique=True)
       role_Created = models.DateTimeField(auto_now_add=True)
       role_Modified = models.DateTimeField(auto_now=True)
-      reporting_role = models.ForeignKey("self", blank=True , null=True  , on_delete=models.CASCADE )
+      reporting_role = models.CharField(max_length=200)
       
       def __str__(self):
            return self.role
+       
+class Role(models.Model):
+    #Model representing the role 
+    
+    #Fields:
+        #name: name of the role 
+    
+    name = models.CharField(max_length=200 ,unique=True)
+    
+    def __str__(self):
+        return self.name
 
 class Address(models.Model):
     
     #Model representing the address of employees.
 
     # Fields:
-    #     country: The country of the address.
-    #     city: The city of the address.
-    #     state: The state of the address.
-    #     zip_Code: The zip code of the address.
-    #     zone: The zone of the address.
-
-
-
+    #     country : The country of the address.
+    #     city : The city of the address.
+    #     state : The state of the address.
+    #     zip_Code : The zip code of the address.
+    #     zone : The zone of the address.
+    
     country = models.CharField(max_length=100)
     city = models.CharField(max_length=64)
     state = models.CharField(max_length=64)
@@ -87,10 +95,11 @@ class Employee(models.Model):
     registration_Date = models.DateField(auto_now_add=True,)
     last_Modified = models.DateTimeField(auto_now=True)
     employee_Id = models.CharField(max_length=100,)
-    web_User = models.BooleanField(default=False)
+    web_User = models.BooleanField(default=False ) 
     
     def __str__(self):
         return self.name  
+    
     class Meta:  
         verbose_name_plural = "Employees"
 
@@ -112,9 +121,9 @@ class user(AbstractUser):
     #     USERNAME_FIELD: The field to use as the unique identifier for authentication ( "username").
     #     REQUIRED_FIELDS: The fields required during user creation (["password", "email"]).
     
-    
+
     name = models.CharField(max_length=200 ,null=True , blank=True )
-    user_permissions = models.ManyToManyField(Permission , related_name="Permited_user")
+    user_permissions = models.ManyToManyField(Permission , related_name="Permited_user"  ,blank=True)
     email = models.EmailField(unique=True,)
     groups = models.ManyToManyField(Group , related_name="users")
     employee = models.OneToOneField(Employee , on_delete=models.PROTECT  , null=True , blank=True , related_name="user")
@@ -144,7 +153,6 @@ class Admin(AbstractUser):
     #     USERNAME_FIELD: The field to use as the unique identifier for authentication ( "email").
     #     REQUIRED_FIELDS: The fields required during user creation (set to ["password"]).
     
-    
     name = models.CharField(max_length=200 ,null=True , blank=True )
     user_permissions = models.ManyToManyField(Permission , related_name="Permited_Admins")
     join_Count = models.IntegerField(default=default_admin_join_Count)
@@ -155,7 +163,7 @@ class Admin(AbstractUser):
     REQUIRED_FIELDS=["password"]
     
     def __str__(self):   
-        return self.username
+        return self.name
     
     class Meta:
         verbose_name_plural = "Admins"

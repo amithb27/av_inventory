@@ -5,12 +5,13 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from smtplib import SMTPException
 import requests
+from rest_framework import generics
 from django.conf import settings
 from django.contrib.auth import authenticate, login,logout
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from rest_framework.response import Response
-from rest_framework.decorators import api_view 
+from rest_framework.decorators import api_view , action
 from rest_framework.views import APIView
 from rest_framework import status 
 from .models import *
@@ -166,16 +167,16 @@ def Login(request):
     #         - Status code: 401 (Unauthorized)
     
     
-    requestedUser = request.data.username
-    password = request.data.password
+    requestedUser = request.data["username"]
+    password = request.data["password"]
     user = authenticate(request, username = requestedUser , password = password)   
     if user is not None :
-        login(request)
+        login(request, user)
+        return Response(data="sucessfully loggedIn" ,status=status.HTTP_200_OK)
     return Response(data="cannot login with the provided credentials " ,status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(["GET"])
 def Logout(request):
-    
     
     # Logs out the currently authenticated user.
 
@@ -185,7 +186,6 @@ def Logout(request):
     # Returns:
     #     - JSON response with a success message: "logout success"
     #     - Status code: 200 (OK)
- 
     logout(request)
     return Response(data={
         "message":"logout success"}, status=status.HTTP_200_OK)
@@ -196,7 +196,7 @@ class Create_Admin(APIView):
         @method_decorator(login_required)
         @permission_required("userData.add_admin")
         def post(self,request): 
-               
+                           
         # Handles the POST request to create a new admin user.
 
 
@@ -210,8 +210,7 @@ class Create_Admin(APIView):
         #     - Status code: 400 (Bad Request)
         #     - JSON response with an error message: "Admin Limit exceeded"
         #     - Status code: 403 (Forbidden)
-       
-
+        
             serializer = AdminSerializer(data=request.data )
             if serializer.is_valid():
                 admin = request.user
@@ -270,12 +269,50 @@ class Create_User(APIView ):
                 return Response(data={"message":"Password changed "} ,status=status.HTTP_200_OK)
             return Response(data=serializer.errors , status=status.HTTP_400_BAD_REQUEST)
         
-
-class create_role(APIView):
-    
+        
+class Role_View(APIView):
     #    API view to create, retrieve, update roles.
+    @method_decorator(login_required)
+    @method_decorator(permission_required(["userData.add_role"]))   
+    def post(self , request):
+        data = request.data
+        print(data ,"Asdf")
+        serializer=  RoleSerializer(data=data )
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message":"created Role"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors , status= status.HTTP_400_BAD_REQUEST)
+
     
+    @method_decorator(login_required)
+    @method_decorator(permission_required(["userData.view_role"]))   
+    def get(self,request):
+        roles = Role.objects.all()
+        serializers = RoleSerializer(roles , many = True)
+        return Response(data=serializers.data , status=status.HTTP_200_OK)    
     
+    @method_decorator(login_required)
+    @method_decorator(permission_required(["userData.view_role"]))
+    def patch(self,request,pk):
+        instance = get_object_or_404(Role,pk=pk)
+        serializer = RoleSerializer(data=request.data , instance= instance)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message":"updated succsusful"} , status=status.HTTP_200_OK)
+        return Response(serializer.errors , status=status.HTTP_400_BAD_REQUEST)
+            
+@api_view(["GET"])
+@login_required
+@permission_required(["userData.view_role"])
+def Get_Role(request,pk):
+    roles = get_object_or_404(Role,pk=pk)
+    serializers =RoleSerializer(roles )
+    print(serializers)
+    return Response(data=serializers.data, status=status.HTTP_200_OK)
+
+
+class RoleHierarchy_View(APIView):
+    #    API view to create, retrieve, update roles.
      
     @method_decorator(permission_required("userData.add_rolehierarchy"))
     @method_decorator(login_required)  
@@ -297,11 +334,11 @@ class create_role(APIView):
             roleData=request.data  
             serializers=RoleHierarchySerializer(data=roleData , context = {"user" : requestedUser})
             if serializers.is_valid():
-                serializers.save()
-                return Response(data={"message":"created"} , status=status.HTTP_201_CREATED)
+                data = serializers.save()
+                return Response(data={data["message"]} , status=data["status"])
             return Response(data = serializers.errors ,status=status.HTTP_400_BAD_REQUEST)
-    
-    
+        return( Response({"message":"Admin Limit exceeds"} , status=status.HTTP_401_UNAUTHORIZED))
+
     @method_decorator(login_required)
     @method_decorator(permission_required("userData.view_rolehierarchy")) 
     def get(self,request,role):
@@ -315,11 +352,11 @@ class create_role(APIView):
         # Returns:
         #     - JSON response with serialized data of the available roles or ancestors
         #     - Status code: 200 (OK)
+    
         
-        
-        role_object =get_object_or_404(RoleHierarchy, name=role)    
+        role_object =get_object_or_404(RoleHierarchy, role=role)    
         available_reporting_roles = role_object.get_ancestors()
-        serializer = RoleHierarchySerializer(available_reporting_roles , )
+        serializer = RoleHierarchySerializer(available_reporting_roles ,)
         print(serializer.data)
         return  serializer.data
     
@@ -340,6 +377,7 @@ class create_role(APIView):
         print(available_roles)
         serializedData = RoleHierarchySerializer(available_roles , many=True)
         return Response(serializedData.data)
+    
     
     @method_decorator(login_required)
     @method_decorator(permission_required("userData.change_rolehierarchy") )
@@ -367,17 +405,40 @@ class create_role(APIView):
            return Response(data=updated , status=status.HTTP_200_OK)
         return Response(data= serializer.errors ,status=status.HTTP_400_BAD_REQUEST)
     
+    @method_decorator(login_required)
+    @method_decorator(permission_required("userData.change_rolehierarchy") )
+    def delete(request , role):
+        """
+        Handles the DELETE request to update a role.
+        
+        Args:
+            request (HttpRequest): The HTTP request object.
+            role (str): The role name to delete.
+
+        Returns:
+            - JSON response with the delete of role
+            - Status code: 200 (OK)
+            - JSON response with conflits while deleting 
+            - Status code: 400 (Bad Request)
+        """
+        cur_Role = RoleHierarchy.objects.get(role= role)
+        child  = cur_Role.get_children_count()
+        if child ==0 :
+            cur_Role.delete()
+            return Response({"message":"Role Deleted"} , status=status.HTTP_200_OK)
+        else:
+            return Response({"message ":"Delete the sub roles first"} , status=status.HTTP_400_BAD_REQUEST)
+            
+    
 @api_view(['GET', 'POST'])
 @login_required
 @permission_required("userData.change_employee")
 def Employees_List(request):
-    print(request.session.session_key,"rhiss is session")
+
     print(user.objects.make_random_password())
     requestedUser = request.user
     
     if request.method == 'GET':
-        dummy = request.build_absolute_uri(reverse(viewname="create_user" ))
-        print(dummy)
         data = Employee.objects.all()
         serializer = EmployeeSerializer(data, many=True)
         return Response(serializer.data ,status=status.HTTP_200_OK)
@@ -386,13 +447,13 @@ def Employees_List(request):
         serializer = EmployeeSerializer(data=request.data ,context = {"requestedUser" : requestedUser})
         if serializer.is_valid():
             (pk,email) = serializer.save()
-            is_Web_user = request.data.web_user
+            is_Web_user = request.data["web_User"]
             if is_Web_user :
                     return requests.post(url=request.build_absolute_uri(reverse(viewname= "create_user" )) , data={
                     "email" :email,
                     "pk" : pk
                     })
-            return Response(data = {"error":"You exceeded your count limit "} ,status=status.HTTP_401_UNAUTHORIZED)
+            return Response(data = {"Message":"employee created"} ,status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -400,6 +461,8 @@ def Employees_List(request):
 @api_view(['PUT', 'DELETE','GET'])
 @permission_required("userData.change_employee")
 def Employees_Details(request, pk):
+    id = request.session
+    print(id)
     #API view to retrieve, update, or delete an employee.
     # Args:
     #     request (HttpRequest): The HTTP request object.
@@ -447,6 +510,7 @@ def Employees_Details(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     elif request.method == 'GET':
+        
         # Handles the GET request to retrieve allEmployess.
 
         # Args:

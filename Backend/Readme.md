@@ -153,7 +153,7 @@ to start a  celery beat :
 #### step2 : Run the email_utilities.py file in terminal 
     This is to Upgrade the necessary SSL certifactes in python
     go to email_Utilites  and Run This Code
-    👉 [email_utilities](userData/email_Utilites.py)
+    👉[email_utilities](userData/email_Utilites.py)
 
 
 

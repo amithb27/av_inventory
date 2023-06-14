@@ -28,12 +28,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',
 
-]
+# CORS_ORIGIN_WHITELIST = [
+#     'http://localhost:3000',
+
+# ]
 # Application definition
 
+#all Apps 
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -46,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+# middle Ware b/w request  & Response 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -57,8 +60,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+#path for URL'S 
 ROOT_URLCONF = 'inventory.urls'
 
+#Templates 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -78,11 +83,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'inventory.wsgi.application'
 
 
-
-AUTH_USER_MODEL = 'userData.user'
-
-
-# Database
+# Database Sqlite3
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
@@ -111,7 +112,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# STATIC_URL = "static"
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
@@ -128,17 +128,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-
+# static files base url
 STATIC_URL = "/static/"
-# STATICFILES_DIRS = (
-#     os.path.join(BASE_DIR,"userData/staticfiles"),
-# )
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+# session based auth
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication'
@@ -146,29 +145,27 @@ REST_FRAMEWORK = {
 }
 
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'your_smtp_host'
-# EMAIL_PORT = your_smtp_port
-# EMAIL_USE_TLS = True  # Use TLS encryption
-# EMAIL_HOST_USER = 'your_email@example.com'
-# EMAIL_HOST_PASSWORD = 'your_email_password'
-# DEFAULT_FROM_EMAIL = 'your_email@example.com'
-
+#smtp server setup
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'pytest.automation123@gmail.com'
 EMAIL_HOST_PASSWORD = 'bvfxpewyizrimqbc'
 EMAIL_PORT = 587
-# DEFAULT_FROM_EMAIL = 'manikantatez@example.com'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
 
+#custum user
+AUTH_USER_MODEL = 'userData.user'
 
-# settings.py
+# Authentication 
+AUTHENTICATION_BACKENDS = [
+    
+    'django.contrib.auth.backends.ModelBackend',  # Default ModelBackend for User model
+]
 
-# ...
 
+# celery beat 
 CELERY_BEAT_SCHEDULE = {
     'task1': {
         'task': "userData.tasks.AniversayMail",
@@ -183,4 +180,3 @@ CELERY_BEAT_SCHEDULE = {
         'schedule':4,
     }
 }
-
