@@ -80,7 +80,6 @@ class Employee(models.Model):
     #     employee_Id: The ID of the employee.
     #     web_User: Indicates if the employee is a web user or not.
     
-    
     name = models.CharField(max_length=240)
     email = models.EmailField(unique=True)
     birthdate = models.DateField(null=True , blank=True)
@@ -89,7 +88,7 @@ class Employee(models.Model):
     joining_Date = models.DateField(blank=True , null=True)
     created_By = models.CharField(max_length=100)
     modified_Person = models.CharField(max_length=200 ,null=True , blank=True)
-    role = models.ForeignKey(RoleHierarchy , on_delete=models.PROTECT ,)
+    role = models.ForeignKey(Role, on_delete=models.PROTECT ,)
     reporting_Person = models.CharField(max_length=200)
     address = models.ForeignKey(Address,on_delete=models.PROTECT  )
     registration_Date = models.DateField(auto_now_add=True,)

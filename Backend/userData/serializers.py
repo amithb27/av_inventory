@@ -86,12 +86,11 @@ class EmployeeSerializer(serializers.ModelSerializer):
         role: Serializer field for the role hierarchy.
         address: Serializer field for the address.
     """
-    role=RoleHierarchySerializer()
     address=AdressSerializer()
     class Meta:
         model = Employee 
-        fields = ('pk', 'name','email','role','phone','address',
-                  'reporting_Person'
+        fields = ('pk', 'name','email','phone','address',
+                  'reporting_Person',"role","employee_Id"
         )
         
     def create(self, validated_data):
@@ -103,32 +102,33 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
         #Returns:
            # tuple: Tuple containing the created employee's primary key and email.
-        
+           
+        print(validated_data)
         current_user = self.context.get("requestedUser")
         name=validated_data['name']
         email=validated_data['email']
-        role=validated_data['role']['role']
+        role=validated_data["role"]
         phone=validated_data['phone']
         reporting_Person=validated_data["reporting_Person"]
         country=validated_data["address"]["country"]
         city = validated_data["address"]["city"]
         zip_code=validated_data["address"]["zip_Code"]
         zone=validated_data["address"]["zone"]
-        employee_Id = Employee_Tag + str(1)
         created_By = current_user.username  
         my_Adress=Address.objects.create(city=city,country=country,
             zip_Code=zip_code , zone=zone)
-        my_Role=RoleHierarchy.objects.get(role=role)
+        
         my_Employee=Employee.objects.create(name=name, email=email,
                                             phone=phone, reporting_Person=reporting_Person,
                                             created_By=created_By,
-                                            role=my_Role, address=my_Adress ,employee_Id =employee_Id)
+                                            role=role, address=my_Adress ,employee_Id =employee_Id)
+        employee_Id = Employee_Tag + my_Employee.pk
         return ( my_Employee.pk , email )
     
 class UserSerializer(serializers.ModelSerializer):
        class Meta:
            model = user
-           fields = ["email",]
+           fields = ["email","employee"]
        def create(self, validated_data):
             #Create a user with a random password.
 
@@ -137,20 +137,18 @@ class UserSerializer(serializers.ModelSerializer):
 
             #Returns:
                 #dict: Dictionary containing the created user's email, password, and pk.
-                
-           email = validated_data.email
-           pk = validated_data.pk
+              
+           email = validated_data["email"]
+           employee = validated_data["employee"]
            password = user.objects.make_random_password()
-           createdUser = user(email = email )
+           createdUser = user(email = email ,username = email)
            createdUser.set_password(password)
-           employee = Employee.objects.get(pk=pk)
-           createdUser.employee = employee
            createdUser.name = employee.name
            createdUser.save() 
            returned_Object = {
                "email":email,
                "password":password,
-               "pk":pk               
+               "pk":self.context.get("employee")             
            }
            return returned_Object  
        
@@ -201,5 +199,3 @@ class AdminSerializer(serializers.ModelSerializer):
             
            instance.set_password(validated_data.password)
            instance.save()
-           
-       

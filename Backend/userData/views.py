@@ -5,7 +5,6 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from smtplib import SMTPException
 import requests
-from rest_framework import generics
 from django.conf import settings
 from django.contrib.auth import authenticate, login,logout
 from django.utils.decorators import method_decorator
@@ -71,11 +70,13 @@ def MobileProfile(request):
             emp = user.employee
             return Response(data={"id":emp.employee_Id} , status=status.HTTP_200_OK)
         else :
-            return Response(data={"message" : "permission is a admin"} , status=status.HTTP_404_NOT_FOUND)
-    return Response(data={} , status=status.HTTP_204_NO_CONTENT)
+            return Response(data={"message" : " requested user is Not an employee "} , status=status.HTTP_404_NOT_FOUND)
+    return Response(data={"message":"Not a mobile device"} , status=status.HTTP_204_NO_CONTENT)
 
 
+@api_view(["POST"])
 def SendMail(request,pk):
+    print(request.data)
     """
     Sends an email with login credentials to an employee.
 
@@ -94,19 +95,19 @@ def SendMail(request,pk):
             - JSON response with an error message: {"message": <error_message>}
             - Status code: 400 (Bad Request)
     """
-    
-    
     data = request.data
     my_date = timezone.now()
     emp= get_object_or_404(Employee,pk=pk)
+    
     year = my_date.strftime("%Y")
     logincredsContext={
         "name" :emp.name,
-        "email"   :data.email,
-        "password":data.password,
+        "email"   :data["email"],
+        "password":data["password"],
         "joiningDate" : emp.joining_Date,
         "year" : year
     }
+    print(emp.email)
     template = render_to_string(template_name="logincreds.html" ,context=logincredsContext)
     
     try  :
@@ -115,12 +116,11 @@ def SendMail(request,pk):
     subject ="Email_testing",
     message= "...Analytics Valley...",
     from_email=settings.EMAIL_HOST_USER,
-    recipient_list=["amith.bhonsle@rugua.in","manikantatez@gmail.com"],
+    recipient_list=[emp.email,],
     fail_silently=False,
+    
         ) 
-        return Response(data={
-            "message":"Email sent" 
-        }, status=status.HTTP_200_OK )
+        return Response(data = {"Message":"employee created And sent Login creds succesfully"} , status=status.HTTP_200_OK )
     except  SMTPException  as e:
         return Response(data={
             "message":e 
@@ -227,10 +227,10 @@ class Create_User(APIView ):
     
     #    API view to create a new user and update user password.
     
-        @method_decorator(login_required)
-        @method_decorator(permission_required("userData.add_user"))
+        # @method_decorator(login_required)
+        # @method_decorator(permission_required("userData.add_user"))
         def post(self,request):
-            
+           
             # Handles the POST request to create a new user.
             
             # Args:
@@ -241,13 +241,15 @@ class Create_User(APIView ):
             #     - Status code: 200 (OK)
             #     - JSON response with validation errors
             #     - Status code: 400 (Bad Request)
-         
-         
-            serializer = UserSerializer(data=request.data)
+            
+            serializer = UserSerializer(data=request.data , context = {"employee":request.data["employee"]})
             if serializer.is_valid():
                 data_Object = serializer.save()
-                return requests.post(url=request.build_absolute_uri(reverse(viewname= "email_Service" , args=(data_Object.pk) )), data=data_Object)
-            return Response( serializer.errors , status= status.HTTP_400_BAD_REQUEST)
+                print(int(data_Object["pk"]))
+                response= requests.post(url=request.build_absolute_uri(reverse(viewname= "email_Service" , kwargs=({"pk": int(data_Object["pk"])}) )), data=data_Object)
+                return Response(data=response.json() ,status=response.status_code)
+            else:    
+                return Response( serializer.errors , status= status.HTTP_400_BAD_REQUEST)
         
         @method_decorator(login_required)
         @permission_required("userData.change_user")
@@ -339,26 +341,6 @@ class RoleHierarchy_View(APIView):
             return Response(data = serializers.errors ,status=status.HTTP_400_BAD_REQUEST)
         return( Response({"message":"Admin Limit exceeds"} , status=status.HTTP_401_UNAUTHORIZED))
 
-    @method_decorator(login_required)
-    @method_decorator(permission_required("userData.view_rolehierarchy")) 
-    def get(self,request,role):
-        
-        # Handles the GET request to retrieve a specific Role with role name.
-
-        # Args:
-        #     request (HttpRequest): The HTTP request object.
-        #     role (str, optional): The name of the role to retrieve its ancestors. Defaults to None.
-
-        # Returns:
-        #     - JSON response with serialized data of the available roles or ancestors
-        #     - Status code: 200 (OK)
-    
-        
-        role_object =get_object_or_404(RoleHierarchy, role=role)    
-        available_reporting_roles = role_object.get_ancestors()
-        serializer = RoleHierarchySerializer(available_reporting_roles ,)
-        print(serializer.data)
-        return  serializer.data
     
     @method_decorator(login_required)
     @method_decorator(permission_required("userData.view_rolehierarchy"))
@@ -428,14 +410,36 @@ class RoleHierarchy_View(APIView):
             return Response({"message":"Role Deleted"} , status=status.HTTP_200_OK)
         else:
             return Response({"message ":"Delete the sub roles first"} , status=status.HTTP_400_BAD_REQUEST)
-            
+
+@api_view(["GET"])       
+@login_required
+@permission_required("userData.view_rolehierarchy")
+def GetRoleNode(request,role):
     
+    # Handles the GET request to retrieve a specific Role with role name.
+
+    # Args:
+    #     request (HttpRequest): The HTTP request object.
+    #     role (str, optional): The name of the role to retrieve its ancestors. Defaults to None.
+
+    # Returns:
+    #     - JSON response with serialized data of the available roles or ancestors
+    #     - Status code: 200 (OK)
+
+    
+    role_object =get_object_or_404(RoleHierarchy, role=role)    
+    available_reporting_roles = role_object.get_ancestors()
+    serializer = RoleHierarchySerializer(available_reporting_roles ,)
+    print(serializer.data)
+    return  serializer.data
+
+
+
 @api_view(['GET', 'POST'])
 @login_required
 @permission_required("userData.change_employee")
 def Employees_List(request):
 
-    print(user.objects.make_random_password())
     requestedUser = request.user
     
     if request.method == 'GET':
@@ -443,16 +447,19 @@ def Employees_List(request):
         serializer = EmployeeSerializer(data, many=True)
         return Response(serializer.data ,status=status.HTTP_200_OK)
     
+    
     elif request.method == 'POST':
-        serializer = EmployeeSerializer(data=request.data ,context = {"requestedUser" : requestedUser})
+        serializer = EmployeeSerializer(data=request.data ,context = {"requestedUser" : requestedUser ,                                                                  "role":request.data["role"]})
         if serializer.is_valid():
             (pk,email) = serializer.save()
             is_Web_user = request.data["web_User"]
+            print(is_Web_user,"asdfdsf")
             if is_Web_user :
-                    return requests.post(url=request.build_absolute_uri(reverse(viewname= "create_user" )) , data={
+                response =  requests.post(url=request.build_absolute_uri(reverse(viewname= "create_user" )) , data={
                     "email" :email,
-                    "pk" : pk
+                    "employee" : pk
                     })
+                return Response(data=response.json(),status=response.status_code)
             return Response(data = {"Message":"employee created"} ,status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
