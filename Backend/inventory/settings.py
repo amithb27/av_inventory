@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 from celery.schedules import crontab
 
+# from userData.ManuallBackend import AdminBackend
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -159,11 +160,10 @@ EMAIL_USE_SSL = False
 AUTH_USER_MODEL = 'userData.user'
 
 # Authentication 
-AUTHENTICATION_BACKENDS = [
-    
+AUTHENTICATION_BACKENDS = [    
+    # 'userData.ManuallBackend.AdminBackend' ,                       
     'django.contrib.auth.backends.ModelBackend',  # Default ModelBackend for User model
 ]
-
 
 # celery beat 
 CELERY_BEAT_SCHEDULE = {

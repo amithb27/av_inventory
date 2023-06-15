@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate, login,logout
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from rest_framework.response import Response
-from rest_framework.decorators import api_view , action
+from rest_framework.decorators import api_view 
 from rest_framework.views import APIView
 from rest_framework import status 
 from .models import *
@@ -18,7 +18,7 @@ from django.contrib.contenttypes.models import ContentType
 from .serializers import *
 from django.contrib.auth.decorators import permission_required
 from django.utils import timezone
-from django.contrib.auth.models import AbstractUser,Group , Permission 
+from django.contrib.auth.models import Permission 
 # Create your views here.
 
 class Employee_Permission(APIView):
@@ -165,8 +165,6 @@ def Login(request):
     #     - If the authentication fails:
     #         - JSON response with an error message: "cannot login with the provided credentials"
     #         - Status code: 401 (Unauthorized)
-    
-    
     requestedUser = request.data["username"]
     password = request.data["password"]
     user = authenticate(request, username = requestedUser , password = password)   
@@ -264,6 +262,7 @@ class Create_User(APIView ):
             #     - Status code: 200 (OK)
             #     - JSON response with validation errors
             #     - Status code: 400 (Bad Request)
+            
             requested_User = request.user
             serializer =  UserSerializer(data=request.data , instance=requested_User ) 
             if serializer.is_valid():

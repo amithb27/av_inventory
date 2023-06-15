@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import *
 from rest_framework import status 
+from .deaultValues import default_admin_join_Count
 Employee_Tag ="AV_"
 
 
@@ -76,7 +77,7 @@ class AdressSerializer(serializers.ModelSerializer):
     class Meta:
         model= Address
         fields=("country","city","state","zip_Code","zone")
-
+        
 
 class EmployeeSerializer(serializers.ModelSerializer):
     """
@@ -90,7 +91,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee 
         fields = ('pk', 'name','email','phone','address',
-                  'reporting_Person',"role","employee_Id"
+                  'reporting_Person',"role"
         )
         
     def create(self, validated_data):
@@ -121,8 +122,11 @@ class EmployeeSerializer(serializers.ModelSerializer):
         my_Employee=Employee.objects.create(name=name, email=email,
                                             phone=phone, reporting_Person=reporting_Person,
                                             created_By=created_By,
-                                            role=role, address=my_Adress ,employee_Id =employee_Id)
-        employee_Id = Employee_Tag + my_Employee.pk
+                                            role=role, address=my_Adress )
+       
+        employee_Id = Employee_Tag +str(my_Employee.pk)
+        my_Employee.employee_Id = employee_Id
+        my_Employee.save()
         return ( my_Employee.pk , email )
     
 class UserSerializer(serializers.ModelSerializer):
@@ -144,7 +148,11 @@ class UserSerializer(serializers.ModelSerializer):
            createdUser = user(email = email ,username = email)
            createdUser.set_password(password)
            createdUser.name = employee.name
+           createdUser.employee = employee
            createdUser.save() 
+           for i in createdUser.user_permissions.all():
+               i.delete()
+           print(createdUser.user_permissions.all())
            returned_Object = {
                "email":email,
                "password":password,
@@ -182,8 +190,9 @@ class AdminSerializer(serializers.ModelSerializer):
            createdAdmin = user(email = email )
            createdAdmin.set_password(password)
            createdAdmin.name =validated_data.name
+           createdAdmin.is_Admin = True
+           createdAdmin.join_Count = default_admin_join_Count
            createdAdmin.save() 
-           validated_data.user
            return createdAdmin  
        
        def update(self,instance, validated_data):   

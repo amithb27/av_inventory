@@ -102,9 +102,8 @@ class Employee(models.Model):
     class Meta:  
         verbose_name_plural = "Employees"
 
-
 class user(AbstractUser):
-    
+
     
     #   Custom User model that extends Django's AbstractUser.
 
@@ -120,13 +119,14 @@ class user(AbstractUser):
     #     USERNAME_FIELD: The field to use as the unique identifier for authentication ( "username").
     #     REQUIRED_FIELDS: The fields required during user creation (["password", "email"]).
     
-
+    username = models.CharField(unique= True , max_length=200)
     name = models.CharField(max_length=200 ,null=True , blank=True )
     user_permissions = models.ManyToManyField(Permission , related_name="Permited_user"  ,blank=True)
     email = models.EmailField(unique=True,)
     groups = models.ManyToManyField(Group , related_name="users")
     employee = models.OneToOneField(Employee , on_delete=models.PROTECT  , null=True , blank=True , related_name="user")
     is_Admin = models.BooleanField(default=False)
+    join_Count = models.IntegerField(null=True , blank=True)
     USERNAME_FIELD = "username"  
     REQUIRED_FIELDS=["password","email"]
     def __str__(self):
@@ -136,36 +136,3 @@ class user(AbstractUser):
         verbose_name_plural = "Users"
         
 
-class Admin(AbstractUser):
-    
-    #   Custom Admin model that extends Django's AbstractUser.
-
-    # Fields:
-    #     name: The name of the admin.
-    #     user_permissions: The admin's permissions.
-    #     join_Count: The join count for the admin.
-    #     email: The email of the admin.
-    #     groups: The groups the admin belongs to.
-    #     is_Admin: Indicates if the user is an admin or not.
-    
-    # Constants:
-    #     USERNAME_FIELD: The field to use as the unique identifier for authentication ( "email").
-    #     REQUIRED_FIELDS: The fields required during user creation (set to ["password"]).
-    
-    name = models.CharField(max_length=200 ,null=True , blank=True )
-    user_permissions = models.ManyToManyField(Permission , related_name="Permited_Admins")
-    join_Count = models.IntegerField(default=default_admin_join_Count)
-    email = models.EmailField(unique=True,)
-    groups = models.ManyToManyField(Group , related_name="admins")
-    is_Admin = models.BooleanField(default=True)
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS=["password"]
-    
-    def __str__(self):   
-        return self.name
-    
-    class Meta:
-        verbose_name_plural = "Admins"
-        
-
-    
