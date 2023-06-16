@@ -18,7 +18,6 @@ from django.contrib import admin
 from django.urls import path 
 from userData.views import *
 urlpatterns = [
-
     path("temp/",Template,name="Temp"),
     path('admin/', admin.site.urls),
     path("employee/", Employees_List, name="employee_list"),
@@ -31,7 +30,7 @@ urlpatterns = [
     path('login/', Login , name="Login "),
     path('logout/', Logout, name="Logout "),
     path( "user/ ",Create_User.as_view() ,  name="create_user"),
-    path("admin/" , Create_Admin.as_view(), name="create_admin"),
+    path("makeAdmin/" , Create_Admin.as_view(), name="create_admin"),
     path("email/<int:pk>", SendMail , name="email_Service"),
     path("permissions/<int:pk>",Employee_Permission.as_view() ,name="permission"),
     path("profile/",MobileProfile,name="profile")

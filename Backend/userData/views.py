@@ -126,7 +126,6 @@ def SendMail(request,pk):
             "message":e 
         }, status=status.HTTP_400_BAD_REQUEST)
 
-
 # this view is for just to see the templates ...
 def Template(request):
     my_date = timezone.now()
@@ -191,8 +190,8 @@ def Logout(request):
 class Create_Admin(APIView):
     #  API view to create a new admin user.
     
-        @method_decorator(login_required)
-        @permission_required("userData.add_admin")
+        # @method_decorator(login_required)
+        # @permission_required("userData.add_user")
         def post(self,request): 
                            
         # Handles the POST request to create a new admin user.
@@ -216,6 +215,7 @@ class Create_Admin(APIView):
                     return Response(data={"message":"Admin Limit exceeded"} , status=status.HTTP_403_FORBIDDEN)
                 serializer.save()
                 admin.join_Count -=1
+                admin.save()
                 return Response(data={
         "message":"Created Admin"}, status= status.HTTP_201_CREATED)
             return Response( serializer.errors , status= status.HTTP_400_BAD_REQUEST)

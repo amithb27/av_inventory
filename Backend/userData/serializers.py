@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import *
 from rest_framework import status 
+from django.contrib.auth.models import  Permission 
+from django.contrib.contenttypes.models import ContentType
 from .deaultValues import default_admin_join_Count
 Employee_Tag ="AV_"
 
@@ -80,6 +82,7 @@ class AdressSerializer(serializers.ModelSerializer):
         
 
 class EmployeeSerializer(serializers.ModelSerializer):
+    
     """
     Serializer for the Employee model.
 
@@ -149,15 +152,13 @@ class UserSerializer(serializers.ModelSerializer):
            createdUser.set_password(password)
            createdUser.name = employee.name
            createdUser.employee = employee
-           createdUser.save() 
-           for i in createdUser.user_permissions.all():
-               i.delete()
-           print(createdUser.user_permissions.all())
+           createdUser.is_staff = True
            returned_Object = {
                "email":email,
                "password":password,
                "pk":self.context.get("employee")             
            }
+           createdUser.save()
            return returned_Object  
        
        def update(self,instance, validated_data):
@@ -171,10 +172,10 @@ class AdminSerializer(serializers.ModelSerializer):
 
     #Fields:
        # email: The email field of the admin.
-        
+       
        class Meta:
            model = user
-           fields = ["email"]
+           fields = ["email","password","name","username"]
        def create(self, validated_data ):
          
         #Create an Admin instance.
@@ -185,20 +186,29 @@ class AdminSerializer(serializers.ModelSerializer):
        # Returns:
            # User: Created User (Admin) instance.
            
-           email = validated_data.email
-           password = validated_data.password
+           email = validated_data["email"]
+           password = validated_data["password"]
            createdAdmin = user(email = email )
            createdAdmin.set_password(password)
-           createdAdmin.name =validated_data.name
+           createdAdmin.name =validated_data["name"]
+           createdAdmin.username = validated_data["username"]
            createdAdmin.is_Admin = True
-           createdAdmin.join_Count = default_admin_join_Count
+           createdAdmin.is_staff = True
            createdAdmin.save() 
+           Content_Type = ContentType.objects.filter(app_label = "userData")
+           perms = []
+           for model in Content_Type :
+                perms += list(Permission.objects.filter(content_type = model))
+           createdAdmin.user_permissions.set(perms)
+           createdAdmin.join_Count = default_admin_join_Count
+           createdAdmin.save()
+           print(password)
            return createdAdmin  
        
        def update(self,instance, validated_data):   
         
         #Update the admin's password.
-
+        
         #Args:
             #instance: Existing User (Admin) instance to be updated.
             #validated_data (dict): Validated data containing the updated password.
