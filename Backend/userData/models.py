@@ -3,8 +3,11 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser,Group , Permission 
 from treebeard.mp_tree import MP_Node
 from django.contrib.contenttypes.models import ContentType
-
+from django.contrib import admin 
 # Create your models here.
+
+class AdminClass(admin.ModelAdmin):
+    readonly_fields = ("role_Modified","role_Created")
 
 class RoleHierarchy(MP_Node):
       
@@ -15,7 +18,7 @@ class RoleHierarchy(MP_Node):
         #role_Created: The datetime when the role was created.
         #role_Modified: The datetime when the role was last modified.
         #reporting_role: The reporting role (foreign key to another RoleHierarchy instance).
-          
+           
       role = models.CharField(max_length=100 , unique=True)
       role_Created = models.DateTimeField(auto_now_add=True)
       role_Modified = models.DateTimeField(auto_now=True)
@@ -79,8 +82,10 @@ class Employee(models.Model):
     #     last_Modified: The datetime when the employee was last modified.
     #     employee_Id: The ID of the employee.
     #     web_User: Indicates if the employee is a web user or not.
-    
-    name = models.CharField(max_length=240)
+    # first_Name =  models.CharField(max_length=240 )
+    # middle_Name =  models.CharField(max_length=240 , null= True , blank= True)
+    # last_Name =  models.CharField(max_length=240 , null= True , blank= True)
+    name = models.CharField(max_length=240 , null= True , blank= True)
     email = models.EmailField(unique=True)
     birthdate = models.DateField(null=True , blank=True)
     phone = models.CharField(max_length=20)

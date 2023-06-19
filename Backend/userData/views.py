@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from smtplib import SMTPException
+from django.core.exceptions import ObjectDoesNotExist
 import requests
 from django.conf import settings
 from django.contrib.auth import authenticate, login,logout
@@ -22,6 +23,7 @@ from django.contrib.auth.models import Permission
 # Create your views here.
 
 class Employee_Permission(APIView):
+
     @method_decorator(login_required)
     @method_decorator(permission_required("userData.view_user"))
     def get(request):
@@ -35,6 +37,7 @@ class Employee_Permission(APIView):
         employee = get_object_or_404(Employee,pk)
         user = employee.user 
         user.user_permissions.add()
+
 
 @login_required()
 @api_view(["POST","GET"])
@@ -58,8 +61,8 @@ def MobileProfile(request):
             - Status code: 204 (No Content)
     """
     
-    user_agent = request.META.get('HTTP_USER_AGENT', '')
-    devices = ['Mobile','Android','iPhone','Tablet','iPad']
+    user_agent = request.META.get('HTTP_USER_AGENT', '').lower()
+    devices = ['mobile','android','iphone','tablet','ipad']
     is_Mobile_User = False
     for device  in devices:
         if device in user_agent:
@@ -126,28 +129,30 @@ def SendMail(request,pk):
             "message":e 
         }, status=status.HTTP_400_BAD_REQUEST)
 
+
 # this view is for just to see the templates ...
 def Template(request):
     my_date = timezone.now()
     joiningDate = my_date.strftime("%d - %B - %Y")
     year = my_date.strftime("%Y")
-    birthDayContext={
+    birthDayContext = {
         "name" :"Employee",
         "year" : year
     }
-    aniversaryContext={
+    aniversaryContext = {
         "name" :"Employee",
         "year" : year,
         "workingYears" : 2
     }
-    logincredsContext={
+    logincredsContext = {
         "name" :"Employee",
         "email"   :"Employee@gmail.com",
         "password":"*******",
         "joiningDate" : joiningDate
     }
     
-    return render(request=request , template_name="birthday.html", context=birthDayContext)
+    return render(request = request , template_name = "birthday.html", context = birthDayContext)
+
 
 @api_view(["POST"])
 def Login(request):
@@ -169,8 +174,9 @@ def Login(request):
     user = authenticate(request, username = requestedUser , password = password)   
     if user is not None :
         login(request, user)
-        return Response(data="sucessfully loggedIn" ,status=status.HTTP_200_OK)
+        return Response(data="sucessfully loggedIn", status=status.HTTP_200_OK)
     return Response(data="cannot login with the provided credentials " ,status=status.HTTP_401_UNAUTHORIZED)
+
 
 @api_view(["GET"])
 def Logout(request):
@@ -187,6 +193,7 @@ def Logout(request):
     return Response(data={
         "message":"logout success"}, status=status.HTTP_200_OK)
 
+#Updating password 2 Views for  admin
 class Create_Admin(APIView):
     #  API view to create a new admin user.
     
@@ -212,15 +219,24 @@ class Create_Admin(APIView):
             if serializer.is_valid():
                 admin = request.user
                 if  admin.join_Count == 0 :
-                    return Response(data={"message":"Admin Limit exceeded"} , status=status.HTTP_403_FORBIDDEN)
+                    return Response(data={"message":"Admin Limit exceeded"}
+                                    , status=status.HTTP_403_FORBIDDEN
+                    )
                 serializer.save()
                 admin.join_Count -=1
                 admin.save()
                 return Response(data={
-        "message":"Created Admin"}, status= status.HTTP_201_CREATED)
+                                    "message":"Created Admin"}, 
+                                status= status.HTTP_201_CREATED
+                )
             return Response( serializer.errors , status= status.HTTP_400_BAD_REQUEST)
-
-
+        
+        @method_decorator(login_required)
+        @method_decorator(permission_required("userData.change_user"))
+        def delete(self, request,pk):
+            admin = get_object_or_404(user , pk=pk)
+            admin.is_active = False
+#Updating password 2 Views for user
 class Create_User(APIView ):
     
     #    API view to create a new user and update user password.
@@ -240,7 +256,8 @@ class Create_User(APIView ):
             #     - JSON response with validation errors
             #     - Status code: 400 (Bad Request)
             
-            serializer = UserSerializer(data=request.data , context = {"employee":request.data["employee"]})
+            serializer = UserSerializer(data=request.data , 
+                                        context = {"employee":request.data["employee"]})
             if serializer.is_valid():
                 data_Object = serializer.save()
                 print(int(data_Object["pk"]))
@@ -248,9 +265,9 @@ class Create_User(APIView ):
                 return Response(data=response.json() ,status=response.status_code)
             else:    
                 return Response( serializer.errors , status= status.HTTP_400_BAD_REQUEST)
-        
+    
+      
         @method_decorator(login_required)
-        @permission_required("userData.change_user")
         def patch(self ,request ):
             # Handles the PATCH request to update the user password.
             
@@ -270,15 +287,19 @@ class Create_User(APIView ):
                 return Response(data={"message":"Password changed "} ,status=status.HTTP_200_OK)
             return Response(data=serializer.errors , status=status.HTTP_400_BAD_REQUEST)
         
-        
+        @method_decorator(login_required)
+        @method_decorator(permission_required("userData.change_user"))
+        def delete(self, request,pk):
+            admin = get_object_or_404(user , pk=pk)
+            admin.is_active = False
+#can change role name      
 class Role_View(APIView):
     #    API view to create, retrieve, update roles.
     @method_decorator(login_required)
-    @method_decorator(permission_required(["userData.add_role"]))   
+    @method_decorator(permission_required(["userData.add_role"])) 
     def post(self , request):
         data = request.data
-        print(data ,"Asdf")
-        serializer=  RoleSerializer(data=data )
+        serializer=  RoleSerializer(data={"name":(data["name"]).upper()})
         if serializer.is_valid():
             serializer.save()
             return Response({"message":"created Role"}, status=status.HTTP_201_CREATED)
@@ -301,14 +322,19 @@ class Role_View(APIView):
             serializer.save()
             return Response({"message":"updated succsusful"} , status=status.HTTP_200_OK)
         return Response(serializer.errors , status=status.HTTP_400_BAD_REQUEST)
-            
+      
+    @method_decorator(login_required)
+    @method_decorator(permission_required("userData.change_role"))
+    def delete(self, request,pk):
+        admin = get_object_or_404(Role , pk=pk)
+        admin.is_active = False  
+              
 @api_view(["GET"])
 @login_required
 @permission_required(["userData.view_role"])
 def Get_Role(request,pk):
-    roles = get_object_or_404(Role,pk=pk)
+    roles = get_object_or_404(Role,pk=pk  )
     serializers =RoleSerializer(roles )
-    print(serializers)
     return Response(data=serializers.data, status=status.HTTP_200_OK)
 
 
@@ -329,17 +355,41 @@ class RoleHierarchy_View(APIView):
         #     - Status code: 201 (Created)
         #     - JSON response with validation errors
         #     - Status code: 400 (Bad Request)
-        
+    
         requestedUser = request.user
         if requestedUser.join_Count > 0 :
             roleData=request.data  
-            serializers=RoleHierarchySerializer(data=roleData , context = {"user" : requestedUser})
-            if serializers.is_valid():
-                data = serializers.save()
-                return Response(data={data["message"]} , status=data["status"])
-            return Response(data = serializers.errors ,status=status.HTTP_400_BAD_REQUEST)
+            role = roleData["role"]
+            reporting_role = roleData["reporting_role"]
+            try :
+                is_unique = RoleHierarchy.objects.get(role = role)
+                return( Response({"message":"Role Already Exists"} , 
+                                 status=status.HTTP_400_BAD_REQUEST)
+                       )
+            except Exception as e:
+                if reporting_role == "self":
+                    root = RoleHierarchy.add_root(role = role , reporting_role = "self")
+                    requestedUser.join_Count -= 1 
+                else:
+                    try :
+                        parent = RoleHierarchy.objects.get(role = reporting_role)
+                        parent.add_child(role = role , reporting_role = reporting_role)
+                        requestedUser.join_Count -= 1 
+                    except ObjectDoesNotExist as e :         
+                        return Response(data = {"message" : "create reporting role First " },status= status.HTTP_400_BAD_REQUEST)
+                return Response({"message":"role Created" }, status=status.HTTP_200_OK)
         return( Response({"message":"Admin Limit exceeds"} , status=status.HTTP_401_UNAUTHORIZED))
-
+   
+    @method_decorator(permission_required("userData.change_rolehierarchy"))
+    @method_decorator(login_required) 
+    def patch(self ,request , pk ):
+        data = request.data
+        instance = get_object_or_404(RoleHierarchy , pk=pk)
+        serializer = RoleHierarchySerializer(data=data , instance=instance )
+        if serializer.is_valid():
+            serializer.save()
+        return Response(serializer.errors , status= status.HTTP_400_BAD_REQUEST)
+    
     
     @method_decorator(login_required)
     @method_decorator(permission_required("userData.view_rolehierarchy"))
@@ -362,32 +412,6 @@ class RoleHierarchy_View(APIView):
     
     @method_decorator(login_required)
     @method_decorator(permission_required("userData.change_rolehierarchy") )
-    def put(self , request,pk):
-        
-        """
-        Handles the PUT request to update a role.
-        
-        Args:
-            request (HttpRequest): The HTTP request object.
-            pk (int): The primary key of the role to update.
-
-        Returns:
-            - JSON response with the updated role data
-            - Status code: 200 (OK)
-            - JSON response with validation errors
-            - Status code: 400 (Bad Request)
-        """
-
-        data = request.data
-        instance = RoleHierarchy.objects.get(pk=pk)
-        serializer =  RoleHierarchySerializer(instance = instance, data=data )
-        if serializer.is_valid():
-           updated =  serializer.save()
-           return Response(data=updated , status=status.HTTP_200_OK)
-        return Response(data= serializer.errors ,status=status.HTTP_400_BAD_REQUEST)
-    
-    @method_decorator(login_required)
-    @method_decorator(permission_required("userData.change_rolehierarchy") )
     def delete(request , role):
         """
         Handles the DELETE request to update a role.
@@ -404,11 +428,12 @@ class RoleHierarchy_View(APIView):
         """
         cur_Role = RoleHierarchy.objects.get(role= role)
         child  = cur_Role.get_children_count()
-        if child ==0 :
-            cur_Role.delete()
+        if child == 0 :
+            cur_Role.is_active = False
             return Response({"message":"Role Deleted"} , status=status.HTTP_200_OK)
         else:
             return Response({"message ":"Delete the sub roles first"} , status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(["GET"])       
 @login_required
@@ -425,13 +450,13 @@ def GetRoleNode(request,role):
     #     - JSON response with serialized data of the available roles or ancestors
     #     - Status code: 200 (OK)
 
-    
-    role_object =get_object_or_404(RoleHierarchy, role=role)    
-    available_reporting_roles = role_object.get_ancestors()
-    serializer = RoleHierarchySerializer(available_reporting_roles ,)
-    print(serializer.data)
-    return  serializer.data
 
+    role_object =get_object_or_404(RoleHierarchy, role=role)  
+    
+    available_reporting_roles = role_object.get_ancestors()
+
+    serializer = RoleHierarchySerializer(available_reporting_roles , many = True )
+    return  Response(data= serializer.data , status= status.HTTP_200_OK)
 
 
 @api_view(['GET', 'POST'])
@@ -512,7 +537,7 @@ def Employees_Details(request, pk):
             - JSON response with validation errors
             - Status code: 400 (Bad Request)
         """
-        emp.delete()
+        emp.is_Active = False
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     elif request.method == 'GET':

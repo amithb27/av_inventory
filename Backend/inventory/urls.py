@@ -24,6 +24,7 @@ urlpatterns = [
     path("employee/<int:pk>", Employees_Details, name="employee_list" ),
     path('rolehierarchy/', RoleHierarchy_View.as_view() , name="create_role" ),
     path('rolehierarchy/<str:role>', GetRoleNode , name="reporting_role_callback"),
+    path('rolehierarchy/<int:pk>' , RoleHierarchy_View.as_view() , name ="updateHyrarchy"),
     path('role/', Role_View.as_view() , name = "roles"),
     path('role/<int:pk>', Get_Role , name = "get_roles"),
     path('role/<int:pk>/update', Role_View.as_view() , name = "get_roles"),
@@ -33,5 +34,5 @@ urlpatterns = [
     path("makeAdmin/" , Create_Admin.as_view(), name="create_admin"),
     path("email/<int:pk>", SendMail , name="email_Service"),
     path("permissions/<int:pk>",Employee_Permission.as_view() ,name="permission"),
-    path("profile/",MobileProfile,name="profile")
+    path("mobileApp/",MobileProfile,name="profile")
 ]
