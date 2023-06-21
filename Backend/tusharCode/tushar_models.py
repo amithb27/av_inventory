@@ -352,7 +352,6 @@ class Manage(models.Model):
     base_Design_Name = models.TextField()
     weight = models.DecimalField(10,2)
     min_Order_Qty = models.IntegerField()
-    max
     product_Pic_Upload = models.ImageField()  # Image field
     remarks = models.TextField()
     puch = models.ForeignKey(Punch_Name, on_delete=models.PROTECT)
@@ -757,6 +756,3 @@ class Planning_For_Classified(models.Model):
     grade = models.CharField(max_length=20)
     base_design_naem = models.CharField(max_length=20)
     weight = models.CharField(max_length=20)
-
-
-

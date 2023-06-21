@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from smtplib import SMTPException
+from .ProjectUtilities import CustomsendMail
 from django.core.exceptions import ObjectDoesNotExist
 import requests
 from django.conf import settings
@@ -337,7 +338,6 @@ def Get_Role(request,pk):
     serializers =RoleSerializer(roles )
     return Response(data=serializers.data, status=status.HTTP_200_OK)
 
-
 class RoleHierarchy_View(APIView):
     #    API view to create, retrieve, update roles.
      
@@ -553,3 +553,28 @@ def Employees_Details(request, pk):
         
         data=EmployeeSerializer(emp)
         return Response(data.data , status=status.HTTP_302_FOUND)
+    
+@login_required 
+@api_view(["POST"])  
+def TriggerMail(request): 
+    data = request.data
+    file = request.Files["image"]
+    file_name = file.name
+    content = file.read()
+    result =CustomsendMail(subject= data["subject"] , message=data["message"],
+                   to_Person=data["to_Person"] ,
+                   template=render_to_string(template_name="birthday.html" ,
+                   imageFiles = [(file_name , content)],
+                   
+    ))
+    if result==True :
+        return Response({"message":"mail sent successfully"} , status= status.HTTP_200_OK)
+    else:
+        return Response(data=result , status = status.HTTP_400_BAD_REQUEST)
+    
+    
+    
+    
+    
+    
+    

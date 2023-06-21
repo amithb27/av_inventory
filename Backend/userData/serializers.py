@@ -3,6 +3,7 @@ from .models import *
 from django.contrib.auth.models import  Permission 
 from django.contrib.contenttypes.models import ContentType 
 from .deaultValues import default_admin_join_Count
+from .ProjectUtilities import makePassword
 Employee_Tag ="AV_"
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -153,7 +154,7 @@ class UserSerializer(serializers.ModelSerializer):
               
            email = validated_data["email"]
            employee = validated_data["employee"]
-           password = user.objects.make_random_password()
+           password = makePassword()
            createdUser = user(email = email ,username = email)
            createdUser.set_password(password)
            createdUser.name = employee.name

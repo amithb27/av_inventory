@@ -48,7 +48,6 @@ class Address(models.Model):
     #     state : The state of the address.
     #     zip_Code : The zip code of the address.
     #     zone : The zone of the address.
-    
     country = models.CharField(max_length=100)
     city = models.CharField(max_length=64)
     state = models.CharField(max_length=64)
@@ -60,7 +59,6 @@ class Address(models.Model):
     
     class Meta:
         verbose_name_plural = "addresses"       
-
 
 class Employee(models.Model):
     
@@ -139,5 +137,73 @@ class user(AbstractUser):
     
     class Meta:  
         verbose_name_plural = "Users"
-        
+ 
+class Customer_Client_Details(models.Model):
+    ## This creates a model for a Client_Details
+    customer_Name = models.CharField(max_length=100)
+    website = models.TextField(max_length=200)
+    reference = models.TextField(max_length=200)
+    description = models.TextField(max_length=200)
+    phone_Number = models.IntegerField()
+    landline_Number = models.IntegerField()
+    pan_Number = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return self.customer_Name       
 
+class Customer_Billing_Details(models.Model):
+    
+    ## This creates a model for a Billing_Details
+    zone = models.CharField(max_length=100) 
+    country = models.CharField(max_length=100) 
+    state = models.CharField(max_length=100) 
+    city = models.CharField(max_length=100) 
+    pin_Code = models.IntegerField() 
+    billing_Name = models.CharField(max_length=100) 
+    billing_GSTIN = models.CharField(max_length=100) 
+    pAN_Number = models.CharField(max_length=100) 
+    udyog_Aadhar = models.IntegerField() 
+    export_No = models.CharField(max_length=100) 
+
+    def __str__(self):
+        return self.country 
+
+class Customer_Shipping_Address(models.Model):
+    
+    ## This creates a model for a Shipping_Address
+    address = models.CharField(max_length=100)
+    zone = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    pin_Code = models.IntegerField()
+    sales_Person = models.CharField(max_length=100)
+    
+  
+    def __str__(self):
+        return self.name  
+
+class Customer(models.Model):
+
+        ## This creates a model for a Customer
+      customer_Id  =  models.CharField(max_length=100)
+      client_Details  = models.ForeignKey(Customer_Client_Details , on_delete=models.PROTECT)
+      billing_Details = models.ForeignKey(Customer_Billing_Details , on_delete=models.PROTECT)
+      shipping_Address = models.ForeignKey(Customer_Shipping_Address , on_delete=models.PROTECT)
+        
+      def __str__(self) :
+          return  self.customer_Id  
+      
+class Inventory_Master(models.Model):
+    
+    ware_House_Code = models.CharField(max_length=10)
+    ware_House_Name = models.CharField(max_length=20)
+    location_1 = models.TextField()
+    Zone = models.CharField()
+    state = models.CharField()
+    city = models.CharField()
+    pincode  = models.CharField()
+    min_Qty = models.CharField( max_length=100)
+    max_Qty = models.CharField( max_length=100)
+    
+        
+    

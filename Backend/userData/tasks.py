@@ -1,5 +1,6 @@
 from __future__ import absolute_import,unicode_literals
-from django.core.mail import send_mail
+from django.core.mail import send_mail , EmailMessage ,EmailMultiAlternatives
+
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.utils import timezone
@@ -21,7 +22,7 @@ def MailSender(template, to_Person ,subject , message):
         None
         
     """
-    
+
     send_mail(
     html_message=template,
     subject =subject,
