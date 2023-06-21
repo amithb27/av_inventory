@@ -557,6 +557,8 @@ def Employees_Details(request, pk):
 @login_required 
 @api_view(["POST"])  
 def TriggerMail(request): 
+    #it will email sender function with attachment files or 
+    #To render in-line media in the template
     data = request.data
     file = request.Files["image"]
     file_name = file.name
@@ -564,17 +566,10 @@ def TriggerMail(request):
     result =CustomsendMail(subject= data["subject"] , message=data["message"],
                    to_Person=data["to_Person"] ,
                    template=render_to_string(template_name="birthday.html" ,
-                   imageFiles = [(file_name , content)],
-                   
+                   imageFiles = [(file_name , content)],    
     ))
     if result==True :
         return Response({"message":"mail sent successfully"} , status= status.HTTP_200_OK)
     else:
         return Response(data=result , status = status.HTTP_400_BAD_REQUEST)
-    
-    
-    
-    
-    
-    
     
