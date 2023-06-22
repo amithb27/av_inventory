@@ -9,30 +9,27 @@ def makePassword():
     digits = string.digits
     special_chars = string.punctuation
     chars = letters +digits+special_chars
-    password = ""
     pass_len = 10
-    alphas = 5
-    nums = 2
-    while True :
-        c = random.choice(chars)
-        print(c)
-        if pass_len == 0:
-            print(nums , alphas)
-            if (nums==0 and alphas==0):
-                return password
-                
-            else:
-                pass_len = 10
-                password=""
-                alphas =5 
-                nums = 2 
-        if c!=" ":
-            if c.isalpha():
-                alphas -=1
-            elif c.isdigit():
-                nums-=1
-            password+=c
-            pass_len -=1
+    password = ""
+    nums = 3
+    alphas = 4
+    special = 3
+    while 1 :
+        ele = random.choice(chars)
+        if (ele.isalpha()) and (alphas>0):
+            password+=ele
+            alphas-=1
+        elif (ele.isdigit()) and (nums>0):
+            password+=ele
+            nums-=1
+        elif (ele !=" ") and (special>0):
+            password+=ele
+            special -=1
+        if len(password) == pass_len :
+            break
+        print(len(password))
+    return password
+        
 
 def CustomsendMail(subject , message , to_Person , template 
              , vedioFiles =None , imageFiles =None):
