@@ -6,6 +6,7 @@ from django.template.loader import render_to_string
 from smtplib import SMTPException
 from .ProjectUtilities import CustomsendMail
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.hashers import check_password
 import requests
 from django.conf import settings
 from django.contrib.auth import authenticate, login,logout
@@ -479,7 +480,7 @@ def Employees_List(request):
             is_Web_user = request.data["web_User"]
             print(is_Web_user,"asdfdsf")
             if is_Web_user :
-                response =  requests.post(url=request.build_absolute_uri(reverse(viewname= "create_user" )) , data={
+                response =  requests.post(url=request.build_absolute_uri(reverse(viewname= "create_user"  )) , data={
                     "email" :email,
                     "employee" : pk
                     })
@@ -572,4 +573,47 @@ def TriggerMail(request):
         return Response({"message":"mail sent successfully"} , status= status.HTTP_200_OK)
     else:
         return Response(data=result , status = status.HTTP_400_BAD_REQUEST)
+
+@api_view('POST')
+def ForgetPassword(request):
+    data = request.data
+    mail = data["email"]
+    requested_user = get_object_or_404(user , email = mail)
+    password = makePassword()
+    requested_user.set_password(password)
+    requested_user.save()
     
+    return Response(
+        data={"message":"Check your registered email for new Password "}
+        ,status=status.HTTP_200_OK
+    )
+  
+@api_view('POST')
+@login_required
+def ResetPassword(request):
+    data = request.data
+    requested_user = request.user
+    curr = data["curr"]
+    new = data["new"]
+    old_password = requested_user.password
+    check = check_password(old_password , curr)
+    if check:
+        requested_user.set_password(new)
+        requested_user.save()
+        return Response(data={"message":
+            "password Changed suscessfully"}
+            ,status=status.HTTP_200_OK
+        )
+    return Response(data={"message":"Old password is incorrect"} ,
+                    status=status.HTTP_400_BAD_REQUEST
+    )
+   
+   
+   
+   
+   
+   
+   
+   
+   
+      

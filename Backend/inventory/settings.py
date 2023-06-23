@@ -169,7 +169,7 @@ AUTHENTICATION_BACKENDS = [
 CELERY_BEAT_SCHEDULE = {
     'task1': {
         'task': "userData.tasks.AniversayMail",
-        'schedule': crontab(minute=0, hour=10),  
+        'schedule': crontab(minute=0, hour=11),  
     },
     'task2': {
         'task': "userData.tasks.BirthdayMail",

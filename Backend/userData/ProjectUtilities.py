@@ -1,7 +1,8 @@
 import string
-import random
+import secrets
 from django.core.mail import EmailMultiAlternatives
 from email.mime.image import MIMEImage
+from .deaultValues import default_user_password_length
 import os
 print( os.path.abspath(""))
 def makePassword():
@@ -9,25 +10,32 @@ def makePassword():
     digits = string.digits
     special_chars = string.punctuation
     chars = letters +digits+special_chars
-    pass_len = 10
+    pass_len = default_user_password_length
     password = ""
-    nums = 3
-    alphas = 4
-    special = 3
+    nums = 1
+    lower = 1
+    special = 1
+    upper = 1
     while 1 :
-        ele = random.choice(chars)
-        if (ele.isalpha()) and (alphas>0):
+        ele = secrets.choice(chars)
+        if (ele.isupper()) and (upper>0):
             password+=ele
-            alphas-=1
+            upper-=1
         elif (ele.isdigit()) and (nums>0):
             password+=ele
             nums-=1
+        elif (ele.islower()) and (lower>0):
+            password+=ele
+            lower-=1
         elif (ele !=" ") and (special>0):
             password+=ele
             special -=1
-        if len(password) == pass_len :
-            break
+        if (nums+lower+special+upper==0) and ele!=" " :
+            if len(password)==pass_len:
+                break
+            password+=ele
         print(len(password))
+        print(password)
     return password
         
 

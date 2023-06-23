@@ -31,6 +31,7 @@ def MailSender(template, to_Person ,subject , message):
     recipient_list=to_Person,
     fail_silently=False,
         ) 
+    
 
 def show():
     today_Date = timezone.now()

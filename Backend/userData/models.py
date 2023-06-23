@@ -203,7 +203,4 @@ class Inventory_Master(models.Model):
     city = models.CharField(max_length=100)
     pincode  = models.CharField(max_length=100)
     min_Qty = models.CharField( max_length=100)
-    max_Qty = models.CharField( max_length=100)
-    
-        
-    
+    max_Qty = models.CharField( max_length=100)  
