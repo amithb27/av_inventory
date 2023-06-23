@@ -4,7 +4,6 @@ from django.core.mail import EmailMultiAlternatives
 from email.mime.image import MIMEImage
 from .deaultValues import default_user_password_length
 import os
-print( os.path.abspath(""))
 def makePassword():
     letters = string.ascii_letters
     digits = string.digits
@@ -34,8 +33,7 @@ def makePassword():
             if len(password)==pass_len:
                 break
             password+=ele
-        print(len(password))
-        print(password)
+  
     return password
         
 
@@ -54,12 +52,11 @@ def CustomsendMail(subject , message , to_Person , template
         for image in vedioFiles:
             (file_name , content) = image
             email.attach(filename=file_name , content=content)
-    email.attach_file("/Users/manikanta/Desktop/Logo.png" ,"image/png")
+    # email.attach_file("/Users/manikanta/Desktop/Logo.png" ,"image/png")
     email.attach_alternative(template , "text/html")
     logo_path = os.path.abspath( os.path.join("userData","static","userData","images","Logo.png"))
     with open(logo_path  ,'rb') as f:
         img = MIMEImage(f.read())
-        print(f)
         img.add_header('Content-ID','<Logo.png>')
         img.add_header('Content-Disposition','inline')  
     email.attach(img)

@@ -1,14 +1,11 @@
 from django.shortcuts import  get_object_or_404
 from django.urls import reverse
 from django.shortcuts import render
-from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from smtplib import SMTPException
 from .ProjectUtilities import CustomsendMail
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import check_password
 import requests
-from django.conf import settings
 from django.contrib.auth import authenticate, login,logout
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -39,7 +36,6 @@ class Employee_Permission(APIView):
         employee = get_object_or_404(Employee,pk)
         user = employee.user 
         user.user_permissions.add()
-
 
 @login_required()
 @api_view(["POST","GET"])
@@ -103,7 +99,6 @@ def SendMail(request,pk):
     data = request.data
     my_date = timezone.now()
     emp= get_object_or_404(Employee,pk=pk)
-    
     year = my_date.strftime("%Y")
     logincredsContext={
         "name" :emp.name,
@@ -112,25 +107,18 @@ def SendMail(request,pk):
         "joiningDate" : emp.joining_Date,
         "year" : year
     }
-    print(emp.email)
     template = render_to_string(template_name="logincreds.html" ,context=logincredsContext)
     
-    try  :
-        send_mail(
-    html_message=template,
-    subject ="Email_testing",
-    message= "...Analytics Valley...",
-    from_email=settings.EMAIL_HOST_USER,
-    recipient_list=[emp.email,],
-    fail_silently=False,
+    sent =  CustomsendMail(template=template , subject= "Login Details ",
+                           to_Person=emp.email , message="Login Details"
+                           )
     
-        ) 
+    if sent == True :
         return Response(data = {"Message":"employee created And sent Login creds succesfully"} , status=status.HTTP_200_OK )
-    except  SMTPException  as e:
+    else:
         return Response(data={
-            "message":e 
+            sent
         }, status=status.HTTP_400_BAD_REQUEST)
-
 
 # this view is for just to see the templates ...
 def Template(request):
@@ -153,7 +141,7 @@ def Template(request):
         "joiningDate" : joiningDate
     }
     
-    return render(request = request , template_name = "birthday.html", context = birthDayContext)
+    return render(request = request , template_name = "forgetpassword.html", context = birthDayContext)
 
 
 @api_view(["POST"])
@@ -574,7 +562,7 @@ def TriggerMail(request):
     else:
         return Response(data=result , status = status.HTTP_400_BAD_REQUEST)
 
-@api_view('POST')
+@api_view(['POST'])
 def ForgetPassword(request):
     data = request.data
     mail = data["email"]
@@ -582,13 +570,21 @@ def ForgetPassword(request):
     password = makePassword()
     requested_user.set_password(password)
     requested_user.save()
-    
+    my_date = timezone.now()
+    year = my_date.strftime("%Y")
+    logincredsContext={
+        "password":password,
+        "year" : year
+    }
+    template = render_to_string(template_name="forgetpassword.html" ,context=logincredsContext)
+    CustomsendMail(message="New password" , subject="New password",
+                   template=template, )
     return Response(
         data={"message":"Check your registered email for new Password "}
         ,status=status.HTTP_200_OK
     )
   
-@api_view('POST')
+@api_view(['POST'])
 @login_required
 def ResetPassword(request):
     data = request.data
