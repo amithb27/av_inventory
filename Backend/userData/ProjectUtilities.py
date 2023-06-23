@@ -1,9 +1,16 @@
 import string
 import secrets
+from .deaultValues import default_user_password_length
+
+
 from django.core.mail import EmailMultiAlternatives
 from email.mime.image import MIMEImage
-from .deaultValues import default_user_password_length
 import os
+
+import pandas as pd
+import xlrd
+from .models import user
+
 def makePassword():
     letters = string.ascii_letters
     digits = string.digits
@@ -38,6 +45,7 @@ def makePassword():
         
 
 def CustomsendMail(subject , message , to_Person , template 
+                   
              , vedioFiles =None , imageFiles =None):
    
     email = EmailMultiAlternatives(subject=subject , body=message ,
@@ -65,3 +73,54 @@ def CustomsendMail(subject , message , to_Person , template
         return True
     except Exception as e:
         return e
+    
+    
+def XlsxExporter(*fields, **model):
+    """
+    Create an Excel file (.xlsx) from a model.
+
+    Args:
+        *fields: Positional arguments (sequence of strings)
+            - field1: Name of the first field in the model to include in the Excel file.
+            - field2: Name of the second field in the model to include in the Excel file.
+            - ...
+
+        **model: Keyword arguments (dictionary)
+            - model: The model class to export.
+
+    Returns:
+        True: If the Excel sheet is successfully created.
+        Exception: If an error occurs during the file creation process
+    """
+    
+    export_Model = model["model"]
+    name = export_Model._meta.model_name +".xlsx"
+    users = export_Model.objects.all()
+    dicts = list(users.values(*fields))
+    data_Frame = pd.DataFrame(dicts)
+    try :
+        data_Frame.to_excel(excel_writer=name,index=False)
+        return (True) 
+    except Exception as e:
+        return (e)
+    
+def XlsxImporter(file , model):
+      undone_list = []
+      done = 0
+      undone = 0
+      df = pd.read_excel(file)
+      for _,row in df.iterrows():
+          print(row)
+          new_model = model(**row)
+          try:
+            new_model.save()
+            done+=1
+          except Exception as e :
+              value = row.values()[0]
+              undone_list.append(value)
+              undone+=1
+      return (done , undone , undone_list)
+  
+      
+
+    
