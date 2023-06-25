@@ -6,6 +6,6 @@ def allModels():
     models=apps.get_models()
     filtered_models = [model for model in models if model._meta.app_config.name == 'userData']
     for model in filtered_models :
-       print(model.__name__)
+       print(model)
        admin.site.register(model)
 allModels()

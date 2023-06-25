@@ -2,12 +2,13 @@ from .deaultValues import *
 from django.db import models
 from django.contrib.auth.models import AbstractUser,Group , Permission 
 from treebeard.mp_tree import MP_Node
-from django.contrib.contenttypes.models import ContentType
-from django.contrib import admin 
+from django.contrib import admin  
+
 # Create your models here.
 
 class AdminClass(admin.ModelAdmin):
     readonly_fields = ("role_Modified","role_Created")
+    
 
 class RoleHierarchy(MP_Node):
       
@@ -105,6 +106,15 @@ class Employee(models.Model):
     class Meta:  
         verbose_name_plural = "Employees"
 
+class Notification(models.Model):
+    messageCode = models.CharField(max_length=10)
+    message = models.CharField(max_length=20)
+    addTime = models.DateTimeField(auto_now_add=True)
+    readTime = models.DateTimeField(auto_now =True)
+    
+    def __str__(self) -> str:
+        return self.messageCode
+
 class user(AbstractUser):
 
     
@@ -132,6 +142,7 @@ class user(AbstractUser):
     join_Count = models.IntegerField(null=True , blank=True)
     USERNAME_FIELD = "username"  
     REQUIRED_FIELDS=["password","email"]
+    notifications = models.ManyToManyField(Notification , related_name="user")
     def __str__(self):
         return self.username
     
@@ -204,3 +215,21 @@ class Inventory_Master(models.Model):
     pincode  = models.CharField(max_length=100)
     min_Qty = models.CharField( max_length=100)
     max_Qty = models.CharField( max_length=100)  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

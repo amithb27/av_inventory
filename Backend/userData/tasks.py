@@ -1,5 +1,5 @@
 from __future__ import absolute_import,unicode_literals
-from django.core.mail import send_mail , EmailMessage ,EmailMultiAlternatives
+from django.core.mail import send_mail 
 
 from django.template.loader import render_to_string
 from django.conf import settings

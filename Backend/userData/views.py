@@ -33,7 +33,11 @@ class Employee_Permission(APIView):
     @method_decorator(permission_required("userData.change_user"))
     def post(request,pk):
         data = request.data
-        employee = get_object_or_404(Employee,pk)
+ 
+        try :
+            employee =  Employee.objects.get(pk=pk)
+        except Exception as e :
+            return Response({"message" : "Employee Not exist "},status= status.HTTP_404_NOT_FOUND)
         user = employee.user 
         user.user_permissions.add()
 
@@ -99,6 +103,10 @@ def SendMail(request,pk):
     data = request.data
     my_date = timezone.now()
     emp= get_object_or_404(Employee,pk=pk)
+    try :
+        emp =  Employee.objects.get(pk=pk)
+    except Exception as e :
+        return Response({"message" : "Employee Not exist "},status= status.HTTP_404_NOT_FOUND)
     year = my_date.strftime("%Y")
     logincredsContext={
         "name" :emp.name,
@@ -184,7 +192,7 @@ def Logout(request):
         "message":"logout success"}, status=status.HTTP_200_OK)
 
 #Updating password 2 Views for  admin
-class Create_Admin(APIView):
+class Create_Admin(APIView):        
     #  API view to create a new admin user.
     
         # @method_decorator(login_required)
@@ -224,7 +232,10 @@ class Create_Admin(APIView):
         @method_decorator(login_required)
         @method_decorator(permission_required("userData.change_user"))
         def delete(self, request,pk):
-            admin = get_object_or_404(user , pk=pk)
+            try :
+                admin =  user.objects.get(pk=pk)
+            except Exception as e :
+                return Response({"message" : "user Not exist "},status= status.HTTP_404_NOT_FOUND)
             admin.is_active = False
 #Updating password 2 Views for user
 class Create_User(APIView ):
@@ -280,7 +291,11 @@ class Create_User(APIView ):
         @method_decorator(login_required)
         @method_decorator(permission_required("userData.change_user"))
         def delete(self, request,pk):
-            admin = get_object_or_404(user , pk=pk)
+
+            try :
+                admin =  user.objects.get(pk=pk)
+            except Exception as e :
+                return Response({"message" : "Admin Not exist "},status= status.HTTP_404_NOT_FOUND)
             admin.is_active = False
 #can change role name      
 class Role_View(APIView):
@@ -306,7 +321,10 @@ class Role_View(APIView):
     @method_decorator(login_required)
     @method_decorator(permission_required(["userData.view_role"]))
     def patch(self,request,pk):
-        instance = get_object_or_404(Role,pk=pk)
+        try :
+            instance =  Role.objects.get(pk=pk)
+        except Exception as e :
+            return Response({"message" : "Role Not exist "},status= status.HTTP_404_NOT_FOUND)
         serializer = RoleSerializer(data=request.data , instance= instance)
         if serializer.is_valid():
             serializer.save()
@@ -324,9 +342,12 @@ class Role_View(APIView):
 @permission_required(["userData.view_role"])
 def Get_Role(request,pk):
     roles = get_object_or_404(Role,pk=pk  )
+    try :
+        emp =  Employee.objects.get(pk=pk)
+    except Exception as e :
+        return Response({"message" : "Employee Not exist "},status= status.HTTP_404_NOT_FOUND)
     serializers =RoleSerializer(roles )
-    return Response(data=serializers.data, status=status.HTTP_200_OK)
-
+    return Response(data=serializers.data, status=status.HTTP_200_OK)   
 class RoleHierarchy_View(APIView):
     #    API view to create, retrieve, update roles.
      
@@ -373,7 +394,11 @@ class RoleHierarchy_View(APIView):
     @method_decorator(login_required) 
     def patch(self ,request , pk ):
         data = request.data
-        instance = get_object_or_404(RoleHierarchy , pk=pk)
+        try :
+            instance =  RoleHierarchy.objects.get(pk=pk)
+        except Exception as e :
+            return Response({"message" : "Employee Not exist "},status= status.HTTP_404_NOT_FOUND)
+        
         serializer = RoleHierarchySerializer(data=data , instance=instance )
         if serializer.is_valid():
             serializer.save()
@@ -439,8 +464,10 @@ def GetRoleNode(request,role):
     #     - JSON response with serialized data of the available roles or ancestors
     #     - Status code: 200 (OK)
 
-
-    role_object =get_object_or_404(RoleHierarchy, role=role)  
+    try :
+        role_object =  RoleHierarchy.objects.get(role=role)
+    except Exception as e :
+        return Response({"message" : "notification Not exist "},status= status.HTTP_404_NOT_FOUND) 
     
     available_reporting_roles = role_object.get_ancestors()
 
@@ -491,8 +518,10 @@ def Employees_Details(request, pk):
     # Returns:
     #     Response: The HTTP response containing the serialized employee data or a success/error message.
 
-    
-    emp = get_object_or_404(Employee,pk=pk)
+    try :
+        emp =  Employee.objects.get(pk=pk)
+    except Exception as e :
+        return Response({"message" : "Employee Not exist "},status= status.HTTP_404_NOT_FOUND)
     if request.method == 'PUT':
         
         """
@@ -603,12 +632,28 @@ def ResetPassword(request):
     return Response(data={"message":"Old password is incorrect"} ,
                     status=status.HTTP_400_BAD_REQUEST
     )
-   
-   
-   
-   
-   
-   
+
+
+class NotificationManager(APIView):
+
+    @method_decorator(login_required)
+    def get(request):
+        requested_user = request.user
+        notifications =  requested_user.notifications.all()
+        seriliazer = NotificationSerializer(notifications , many= True)
+        if seriliazer.is_valid():
+            return Response({"data":seriliazer.data}, status= status.HTTP_200_OK)
+    
+    @method_decorator(login_required)
+    def update(request , pk ):
+        try :
+            notification =  Notification.objects.get(pk=pk)
+        except Exception as e :
+            return Response({"message" : "notification Not exist "},status= status.HTTP_404_NOT_FOUND)
+        notification.is_active = False
+        notification.save()
+        
+
    
    
    

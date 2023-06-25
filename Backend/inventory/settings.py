@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'userData',
     'rest_framework',
     'corsheaders',
+    'django_channels_notifications',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',

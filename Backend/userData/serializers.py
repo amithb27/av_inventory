@@ -176,6 +176,7 @@ class UserSerializer(serializers.ModelSerializer):
 class AdminSerializer(serializers.ModelSerializer):
     
     
+    
     #Serializer for the Admin model.
 
     #Fields:
@@ -226,3 +227,14 @@ class AdminSerializer(serializers.ModelSerializer):
             
            instance.set_password(validated_data.password)
            instance.save()
+           
+
+class NotificationSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model : Notification
+        fields = "__all__"  
+              
+           
+           
+           

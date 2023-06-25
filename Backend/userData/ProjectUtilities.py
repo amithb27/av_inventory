@@ -7,9 +7,9 @@ from django.core.mail import EmailMultiAlternatives
 from email.mime.image import MIMEImage
 import os
 
+from .models import *
+
 import pandas as pd
-import xlrd
-from .models import user
 
 def makePassword():
     letters = string.ascii_letters
@@ -104,6 +104,7 @@ def XlsxExporter(*fields, **model):
     except Exception as e:
         return (e)
     
+    
 def XlsxImporter(file , model):
       undone_list = []
       done = 0
@@ -121,6 +122,17 @@ def XlsxImporter(file , model):
               undone+=1
       return (done , undone , undone_list)
   
-      
-
+def CreateNotification(user , message , messageCode):
+     notification = Notification(message = message , 
+                                 messageCode = messageCode                       
+     )
+     try:
+        notification.save()
+     except Exception as e :
+         return e 
+     user.notifications.add(notification)
+     return  True
     
+        
+      
+      
