@@ -35,7 +35,7 @@ urlpatterns = [
     path("email/<int:pk>", SendMail , name="email_Service"),
     path("permissions/<int:pk>",Employee_Permission.as_view() ,name="permission"),
     path("mobileApp/",MobileProfile,name="profile"),
-    path('forgetPassword/' , ForgetPassword , name="forgetPassword"),
+    path('forgetPassword/' , ForgotPassword , name="forgetPassword"),
     path('restPassword',ResetPassword , name="restPassword"),
     path('triggerMail',TriggerMail , name='triggerMail'),
     

@@ -503,7 +503,6 @@ def Employees_List(request):
             return Response(data = {"Message":"employee created"} ,status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 @login_required
 @api_view(['PUT', 'DELETE','GET'])
 @permission_required("userData.change_employee")
@@ -591,8 +590,9 @@ def TriggerMail(request):
     else:
         return Response(data=result , status = status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['POST'])
-def ForgetPassword(request):
+def ForgotPassword(request):
     data = request.data
     mail = data["email"]
     requested_user = get_object_or_404(user , email = mail)
@@ -633,7 +633,6 @@ def ResetPassword(request):
                     status=status.HTTP_400_BAD_REQUEST
     )
 
-
 class NotificationManager(APIView):
 
     @method_decorator(login_required)
@@ -653,8 +652,5 @@ class NotificationManager(APIView):
         notification.is_active = False
         notification.save()
         
-
-   
-   
-   
-      
+        
+        

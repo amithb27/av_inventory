@@ -11,6 +11,7 @@ from .models import *
 
 import pandas as pd
 
+
 def makePassword():
     letters = string.ascii_letters
     digits = string.digits
@@ -42,7 +43,7 @@ def makePassword():
             password+=ele
   
     return password
-        
+   
 
 def CustomsendMail(subject , message , to_Person , template 
                    
@@ -73,7 +74,7 @@ def CustomsendMail(subject , message , to_Person , template
         return True
     except Exception as e:
         return e
-    
+
     
 def XlsxExporter(*fields, **model):
     """
@@ -109,7 +110,8 @@ def XlsxImporter(file , model):
       undone_list = []
       done = 0
       undone = 0
-      df = pd.read_excel(file)
+      df = pd.read_excel(file ,)
+
       for _,row in df.iterrows():
           print(row)
           new_model = model(**row)
@@ -121,6 +123,7 @@ def XlsxImporter(file , model):
               undone_list.append(value)
               undone+=1
       return (done , undone , undone_list)
+ 
   
 def CreateNotification(user , message , messageCode):
      notification = Notification(message = message , 
@@ -132,7 +135,7 @@ def CreateNotification(user , message , messageCode):
          return e 
      user.notifications.add(notification)
      return  True
-    
-        
-      
-      
+ 
+ 
+ 
+ 

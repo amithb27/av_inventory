@@ -147,6 +147,8 @@ to start a  celery beat :
 
 ## Setup of STMP Server for Mail 
 
+###### reference -[Reference Vedio](https://youtu.be/1YXVdyVuFGA)
+    
 #### step1 : Check for certifi pip package
     This Package comes with the requirements.txt 
 
@@ -155,6 +157,5 @@ to start a  celery beat :
     go to email_Utilites  and Run This Code
     👉[email_utilities](userData/email_Utilites.py)
 
-
-
+    go to here 👉👉   [SSL certifications upgrade Link](https://gist.github.com/marschhuynh/31c9375fc34a3e20c2d3b9eb8131d8f3#gistcomment-4608393)
    

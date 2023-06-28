@@ -66,6 +66,7 @@ def BirthdayMail():
                 }
                 template = render_to_string(template_name="birthday.html",context=birthDayContext)
                 MailSender(template,emp.email,subject="",message="")
+                         
 
 @shared_task
 def AniversayMail():
@@ -90,8 +91,8 @@ def AniversayMail():
                     "year" : current_Year,
                     "workingYears" : working_Years 
                 }
-                
+
                 template = render_to_string(template_name="aniversary.html",context=aniversaryContext , subject="",message="")
                 MailSender(template,emp.email)
 
-    
+

@@ -95,7 +95,7 @@ class Employee(models.Model):
     role = models.ForeignKey(Role, on_delete=models.PROTECT ,)
     reporting_Person = models.CharField(max_length=200)
     address = models.ForeignKey(Address,on_delete=models.PROTECT  )
-    registration_Date = models.DateField(auto_now_add=True,)
+    registration_Date = models.DateField(auto_now_add=True)
     last_Modified = models.DateTimeField(auto_now=True)
     employee_Id = models.CharField(max_length=100,)
     web_User = models.BooleanField(default=False ) 
