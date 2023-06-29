@@ -101,7 +101,6 @@ class Shipping_Address(models.Model):
     def __str__(self):
         return self.name  
 
-    
      
 
 class Customer(models.Model):
@@ -247,7 +246,6 @@ class Item_Status(models.Model):
     
     def __str__(self):
         return self.item_Status_Name
-
 
 
 class Grade(models.Model):
@@ -756,3 +754,7 @@ class Planning_For_Classified(models.Model):
     grade = models.CharField(max_length=20)
     base_design_naem = models.CharField(max_length=20)
     weight = models.CharField(max_length=20)
+
+
+
+

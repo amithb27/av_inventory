@@ -8,7 +8,6 @@ from django.contrib import admin
 
 class AdminClass(admin.ModelAdmin):
     readonly_fields = ("role_Modified","role_Created")
-    
 
 class RoleHierarchy(MP_Node):
       

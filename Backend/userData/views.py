@@ -474,33 +474,55 @@ def GetRoleNode(request,role):
     serializer = RoleHierarchySerializer(available_reporting_roles , many = True )
     return  Response(data= serializer.data , status= status.HTTP_200_OK)
 
-
 @api_view(['GET', 'POST'])
-@login_required
 @permission_required("userData.change_employee")
 def Employees_List(request):
-
+    # Get the user making the request
     requestedUser = request.user
     
     if request.method == 'GET':
+        # Handle GET request to retrieve all employees
         data = Employee.objects.all()
-        serializer = EmployeeSerializer(data, many=True)
-        return Response(serializer.data ,status=status.HTTP_200_OK)
-    
-    
+        serializer = EmployeeSerializer(data, many=True)   
+        return Response(serializer.data, status=status.HTTP_200_OK)
+       
     elif request.method == 'POST':
-        serializer = EmployeeSerializer(data=request.data ,context = {"requestedUser" : requestedUser ,                                                                  "role":request.data["role"]})
+        # Handle POST request to create a new employee
+        
+        # Create a serializer instance with the request data
+        serializer = EmployeeSerializer(data=request.data, context={"requestedUser": requestedUser, "role": request.data["role"]})
+        
         if serializer.is_valid():
-            (pk,email) = serializer.save()
+            # Save the employee and get the primary key (pk) and email
+            (pk, email) = serializer.save()
+            
+            # Check if the employee is also a web user
             is_Web_user = request.data["web_User"]
-            print(is_Web_user,"asdfdsf")
-            if is_Web_user :
-                response =  requests.post(url=request.build_absolute_uri(reverse(viewname= "create_user"  )) , data={
-                    "email" :email,
-                    "employee" : pk
-                    })
-                return Response(data=response.json(),status=response.status_code)
-            return Response(data = {"Message":"employee created"} ,status=status.HTTP_200_OK)
+            
+            # Print the value of is_Web_user (for debugging or logging purposes)
+            print(is_Web_user, "asdfdsf")
+            
+            if is_Web_user:
+                # If the employee is also a web user, send a request to create a user
+                
+                # Construct the URL for the create_user view
+                create_user_url = request.build_absolute_uri(reverse(viewname="create_user"))
+                
+                # Prepare the data for the create user request
+                user_data = {
+                    "email": email,
+                    "employee": pk
+                }
+                
+                # Send a POST request to create the user
+                response = requests.post(url=create_user_url, data=user_data)
+                
+                return Response(data=response.json(), status=response.status_code)
+            
+            # Return a success response indicating that the employee was created
+            return Response(data={"Message": "Employee created"}, status=status.HTTP_200_OK)
+        
+        # Return an error response with serializer errors if the data is invalid
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @login_required
@@ -574,83 +596,136 @@ def Employees_Details(request, pk):
 @login_required 
 @api_view(["POST"])  
 def TriggerMail(request): 
-    #it will email sender function with attachment files or 
-    #To render in-line media in the template
+    # This view requires the user to be authenticated
+    
+    # Retrieve the data from the request
     data = request.data
-    file = request.Files["image"]
+    
+    # Get the image file from the request
+    file = request.FILES["image"]
+    
+    # Extract the file name and content
     file_name = file.name
     content = file.read()
-    result =CustomsendMail(subject= data["subject"] , message=data["message"],
-                   to_Person=data["to_Person"] ,
-                   template=render_to_string(template_name="birthday.html" ,
-                   imageFiles = [(file_name , content)],    
-    ))
-    if result==True :
-        return Response({"message":"mail sent successfully"} , status= status.HTTP_200_OK)
+    
+    # Prepare the parameters for sending the email
+    email_subject = data["subject"]
+    email_message = data["message"]
+    to_person = data["to_Person"]
+    
+    # Render the email template with in-line media (image attachment)
+    template = render_to_string(template_name="birthday.html", imageFiles=[(file_name, content)])
+    
+    # Send the email using the CustomsendMail function
+    result = CustomsendMail(subject=email_subject, message=email_message, to_Person=to_person, template=template)
+    
+    if result == True:
+        # If the email was sent successfully, return a success response
+        return Response({"message": "Mail sent successfully"}, status=status.HTTP_200_OK)
     else:
-        return Response(data=result , status = status.HTTP_400_BAD_REQUEST)
+        # If there was an error sending the email, return an error response with the result
+        return Response(data=result, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
 def ForgotPassword(request):
+    # Retrieve the data from the request
     data = request.data
     mail = data["email"]
-    requested_user = get_object_or_404(user , email = mail)
+    
+    # Get the requested user based on the provided email
+    requested_user = get_object_or_404(user, email=mail)
+    
+    # Generate a new password
     password = makePassword()
+    
+    # Set the new password for the requested user
     requested_user.set_password(password)
     requested_user.save()
+    
+    # Get the current year
     my_date = timezone.now()
     year = my_date.strftime("%Y")
-    logincredsContext={
-        "password":password,
-        "year" : year
+    
+    # Prepare the context for the password reset email template
+    logincredsContext = {
+        "password": password,
+        "year": year
     }
-    template = render_to_string(template_name="forgetpassword.html" ,context=logincredsContext)
-    CustomsendMail(message="New password" , subject="New password",
-                   template=template, )
+    
+    # Render the password reset email template
+    template = render_to_string(template_name="forgetpassword.html", context=logincredsContext)
+    
+    # Send the password reset email
+    CustomsendMail(message="New password", subject="New password", template=template)
+    
     return Response(
-        data={"message":"Check your registered email for new Password "}
-        ,status=status.HTTP_200_OK
+        data={"message": "Check your registered email for a new password"},
+        status=status.HTTP_200_OK
     )
+
   
 @api_view(['POST'])
 @login_required
 def ResetPassword(request):
+    # Retrieve the data from the request
     data = request.data
+    
+    # Get the requested user based on the authenticated user making the request
     requested_user = request.user
+    
+    # Extract the current and new passwords from the data
     curr = data["curr"]
     new = data["new"]
+    
+    # Get the current password of the requested user
     old_password = requested_user.password
-    check = check_password(old_password , curr)
+    
+    # Check if the current password provided matches the user's current password
+    check = check_password(old_password, curr)
+    
     if check:
+        # If the current password is correct, set the new password for the user
         requested_user.set_password(new)
         requested_user.save()
-        return Response(data={"message":
-            "password Changed suscessfully"}
-            ,status=status.HTTP_200_OK
-        )
-    return Response(data={"message":"Old password is incorrect"} ,
-                    status=status.HTTP_400_BAD_REQUEST
-    )
+        
+        return Response(data={"message": "Password changed successfully"}, status=status.HTTP_200_OK)
+    
+    # If the current password is incorrect, return an error response
+    return Response(data={"message": "Old password is incorrect"}, status=status.HTTP_400_BAD_REQUEST)
 
 class NotificationManager(APIView):
 
     @method_decorator(login_required)
     def get(request):
+        # Get the requested user based on the authenticated user making the request
         requested_user = request.user
-        notifications =  requested_user.notifications.all()
-        seriliazer = NotificationSerializer(notifications , many= True)
-        if seriliazer.is_valid():
-            return Response({"data":seriliazer.data}, status= status.HTTP_200_OK)
+        
+        # Retrieve all notifications for the requested user
+        notifications = requested_user.notifications.all()
+        
+        # Serialize the notifications
+        serializer = NotificationSerializer(notifications, many=True)
+        
+        if serializer.is_valid():
+            # Return the serialized data in the response
+            return Response({"data": serializer.data}, status=status.HTTP_200_OK)
     
     @method_decorator(login_required)
-    def update(request , pk ):
-        try :
-            notification =  Notification.objects.get(pk=pk)
-        except Exception as e :
-            return Response({"message" : "notification Not exist "},status= status.HTTP_404_NOT_FOUND)
+    def update(request, pk):
+        try:
+            # Get the notification based on the provided primary key (pk)
+            notification = Notification.objects.get(pk=pk)
+        except Exception as e:
+            # If the notification does not exist, return an error response
+            return Response({"message": "Notification does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Mark the notification as inactive
         notification.is_active = False
         notification.save()
         
-        
-        
+        # Return a success response indicating the notification was updated
+        return Response(status=status.HTTP_200_OK)
+
+
+

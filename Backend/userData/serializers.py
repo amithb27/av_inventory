@@ -87,12 +87,11 @@ class EmployeeSerializer(serializers.ModelSerializer):
         role: Serializer field for the role hierarchy.
         address: Serializer field for the address.
     """
-    address=AdressSerializer()
+
     class Meta:
         model = Employee 
         fields = ('pk', 'name','email','phone','address',
-                  'reporting_Person',"role","first_Name",
-                  "last_Name"
+                  'reporting_Person',"role"
         )
         
     def create(self, validated_data):
