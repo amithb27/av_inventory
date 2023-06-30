@@ -733,4 +733,3 @@ def GetEmployeeWithRole(request , role):
     serilizer = EmployeeSerializer(emp , many = True)
     return Response(serilizer.data , status=status.HTTP_200_OK)
 
-

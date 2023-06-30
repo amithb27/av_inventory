@@ -19,10 +19,10 @@ class RoleHierarchy(MP_Node):
         #role_Modified: The datetime when the role was last modified.
         #reporting_role: The reporting role (foreign key to another RoleHierarchy instance).
            
-      role = models.CharField(max_length=100 , unique=True)
+      role = models.CharField(help_text="role_name", max_length=100 , unique=True)
       role_Created = models.DateTimeField(auto_now_add=True)
       role_Modified = models.DateTimeField(auto_now=True)
-      reporting_role = models.CharField(max_length=200)
+      reporting_role = models.CharField(max_length=200 )
       
       def __str__(self):
            return self.role
