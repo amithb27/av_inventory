@@ -341,12 +341,11 @@ class Role_View(APIView):
 @login_required
 @permission_required(["userData.view_role"])
 def Get_Role(request,pk):
-    roles = get_object_or_404(Role,pk=pk  )
     try :
-        emp =  Employee.objects.get(pk=pk)
+        role =  Role.objects.get(pk=pk)
     except Exception as e :
-        return Response({"message" : "Employee Not exist "},status= status.HTTP_404_NOT_FOUND)
-    serializers =RoleSerializer(roles )
+        return Response({"message" : "Role not exists "},status= status.HTTP_404_NOT_FOUND)
+    serializers =RoleSerializer(role )
     return Response(data=serializers.data, status=status.HTTP_200_OK)   
 class RoleHierarchy_View(APIView):
     #    API view to create, retrieve, update roles.
@@ -727,5 +726,11 @@ class NotificationManager(APIView):
         # Return a success response indicating the notification was updated
         return Response(status=status.HTTP_200_OK)
 
+
+@api_view(['GET'])
+def GetEmployeeWithRole(request , role):
+    emp = Employee.objects.filter(role=role)
+    serilizer = EmployeeSerializer(emp , many = True)
+    return Response(serilizer.data , status=status.HTTP_200_OK)
 
 

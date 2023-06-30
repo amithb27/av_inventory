@@ -49,8 +49,8 @@ class Address(models.Model):
     #     zip_Code : The zip code of the address.
     #     zone : The zone of the address.
     country = models.CharField(max_length=100)
-    city = models.CharField(max_length=64)
-    state = models.CharField(max_length=64)
+    city = models.CharField(max_length=64 , blank=True)
+    state = models.CharField(max_length=64 )
     zip_Code = models.IntegerField()
     zone = models.CharField(max_length=100)
     
@@ -148,59 +148,71 @@ class user(AbstractUser):
     class Meta:  
         verbose_name_plural = "Users"
  
-class Customer_Client_Details(models.Model):
-    ## This creates a model for a Client_Details
-    customer_Name = models.CharField(max_length=100)
-    website = models.TextField(max_length=200)
-    reference = models.TextField(max_length=200)
-    description = models.TextField(max_length=200)
-    phone_Number = models.IntegerField()
-    landline_Number = models.IntegerField()
-    pan_Number = models.CharField(max_length=100)
+# class Customer_Client_Details(models.Model):
+#     ## This creates a model for a Client_Details
+#     customer_Name = models.CharField(max_length=100)
+#     website = models.TextField(max_length=200)
+#     reference = models.TextField(max_length=200)
+#     description = models.TextField(max_length=200)
+#     phone_Number = models.IntegerField()
+#     landline_Number = models.IntegerField()
+#     pan_Number = models.CharField(max_length=100)
     
-    def __str__(self):
-        return self.customer_Name       
+#     def __str__(self):
+#         return self.customer_Name       
 
-class Customer_Billing_Details(models.Model):
+# class Customer_Billing_Details(models.Model):
     
-    ## This creates a model for a Billing_Details
-    zone = models.CharField(max_length=100) 
-    country = models.CharField(max_length=100) 
-    state = models.CharField(max_length=100) 
-    city = models.CharField(max_length=100) 
-    pin_Code = models.IntegerField() 
-    billing_Name = models.CharField(max_length=100) 
-    billing_GSTIN = models.CharField(max_length=100) 
-    pAN_Number = models.CharField(max_length=100) 
-    udyog_Aadhar = models.IntegerField() 
-    export_No = models.CharField(max_length=100) 
+#     ## This creates a model for a Billing_Details
+#     zone = models.CharField(max_length=100) 
+#     country = models.CharField(max_length=100) 
+#     state = models.CharField(max_length=100) 
+#     city = models.CharField(max_length=100) 
+#     pin_Code = models.IntegerField() 
+#     billing_Name = models.CharField(max_length=100) 
+#     billing_GSTIN = models.CharField(max_length=100) 
+#     pAN_Number = models.CharField(max_length=100) 
+#     udyog_Aadhar = models.IntegerField() 
+#     export_No = models.CharField(max_length=100) 
 
-    def __str__(self):
-        return self.country 
+#     def __str__(self):
+#         return self.country 
 
-class Customer_Shipping_Address(models.Model):
+# class Customer_Shipping_Address(models.Model):
     
-    ## This creates a model for a Shipping_Address
-    address = models.CharField(max_length=100)
-    zone = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    city = models.CharField(max_length=100)
-    pin_Code = models.IntegerField()
-    sales_Person = models.CharField(max_length=100)
+#     ## This creates a model for a Shipping_Address
+#     address = models.CharField(max_length=100)
+#     zone = models.CharField(max_length=100)
+#     state = models.CharField(max_length=100)
+#     city = models.CharField(max_length=100)
+#     pin_Code = models.IntegerField()
+#     sales_Person = models.CharField(max_length=100)
     
   
-    def __str__(self):
-        return self.name  
+#     def __str__(self):
+#         return self.name  
+
+class Company_Details(models.Model):
+      company_Name =  models.CharField(max_length=100)
+      landline =  models.CharField(max_length=100)
+      mobile =  models.CharField(max_length=100)
+      email =  models.CharField(max_length=100)
+    #  customer_type = models.ForeignKey(Customer_Type, on_delete=models.PROTECT)
+      special_Remarks = models.CharField(max_length=100)
+      sales_Person  = models.ForeignKey(Employee, on_delete=models.PROTECT)
+
+class Contact_Details(models.Model):
+      contact_Name =  models.CharField(max_length=100)
+      landline =  models.CharField(max_length=100)
+      mobile =  models.CharField(max_length=100)
+      email =  models.CharField(max_length=100)
 
 class Customer(models.Model):
-
         ## This creates a model for a Customer
-      customer_Id  =  models.CharField(max_length=100)
-      client_Details  = models.ForeignKey(Customer_Client_Details , on_delete=models.PROTECT)
-      billing_Details = models.ForeignKey(Customer_Billing_Details , on_delete=models.PROTECT)
-      shipping_Address = models.ForeignKey(Customer_Shipping_Address , on_delete=models.PROTECT)
-        
-      def __str__(self) :
+     company_Details = models.ForeignKey(Company_Details , on_delete=models.CASCADE)
+     contact_Details =  models.ForeignKey(Contact_Details , on_delete=models.CASCADE)
+     adress_Details = models.ForeignKey(Address , on_delete=models.CASCADE)
+     def __str__(self) :
           return  self.customer_Id  
       
 class Inventory_Master(models.Model):
