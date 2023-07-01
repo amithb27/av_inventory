@@ -229,6 +229,38 @@ class Inventory_Master(models.Model):
 
 
 
+class Product(models.Model):
+    product_Name = models.CharField(max_length=100)
+    status = models.BooleanField(default=True)
+    def __str__(self):
+        return self.product_Name
+    
+
+class Brand(models.Model):
+    brand_Name = models.CharField(max_length=20)
+    status = models.BooleanField(default=True)
+    def __str__(self):
+        return self.brand_Name
+    
+class Size(models.Model):
+    size_Name = models.CharField(max_length=100)
+    status = models.BooleanField(default=True)
+    def __str__(self):
+        return self.size_Name
+    
+class Cetegory(models.Model):
+    cetegory_Name = models.CharField(max_length=100)
+    status = models.BooleanField(default=True)
+    def __str__(self):
+        return self.cetegory_Name
+    
+class Unit(models.Model):
+    unit_name = models.CharField(max_length=100)
+    status = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.unit_name
+    
 
 
 

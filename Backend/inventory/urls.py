@@ -35,6 +35,9 @@ schema_view = get_schema_view(
 from django.contrib import admin
 from django.urls import path 
 from userData.views import *
+
+from userData import views
+
 urlpatterns = [
     path("temp/",Template,name="Temp"),
     path('admin/', admin.site.urls),
@@ -59,5 +62,10 @@ urlpatterns = [
     path('getempwithRole/<int:role>' ,GetEmployeeWithRole , name="GetEmployeeWithRole"),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('product/', views.product_list),
+    path('brand/', views.brand_list),
+    path('size/', views.size_list),
+    path('cetegory/', views.cetegory_list),
+    path('unit/', views.unit_list)
     
 ]

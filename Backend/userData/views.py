@@ -733,3 +733,87 @@ def GetEmployeeWithRole(request , role):
     serilizer = EmployeeSerializer(emp , many = True)
     return Response(serilizer.data , status=status.HTTP_200_OK)
 
+
+# api view for product , brand, size, list
+@api_view(['GET', 'POST'])
+def product_list(request):
+
+    if request.method == 'GET':
+        Products = Product.objects.all()
+        serializer = ProductSerializer(Products, many=True)
+        # return JsonResponse({"drinks": serializers.data})
+        return Response(serializer.data)
+        
+    
+    if request.method == 'POST':
+        serializer = ProductSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+# api for 
+@api_view(['GET', 'POST'])
+def brand_list(request):
+
+    if request.method == 'GET':
+        drinks = Brand.objects.all()
+        serializer = BrandSerialilzer(drinks, many=True)
+        # return JsonResponse({"drinks": serializers.data})
+        return Response(serializer.data)
+        
+    
+    if request.method == 'POST':
+        serializer = BrandSerialilzer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+
+@api_view(['GET', 'POST'])
+def size_list(request):
+    if request.method == 'GET':
+        drinks = Size.objects.all()
+        serializer = SizeSeriallizer(drinks, many=True)
+        # return JsonResponse({"drinks": serializers.data})
+        return Response(serializer.data)
+        
+    
+    if request.method == 'POST':
+        serializer = SizeSeriallizer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
+@api_view(['GET', 'POST'])
+def cetegory_list(request):
+    if request.method == 'GET':
+        drinks = Cetegory.objects.all()
+        serializer = CetegorySerializer(drinks, many=True)
+        # return JsonResponse({"drinks": serializers.data})
+        return Response(serializer.data)
+        
+    
+    if request.method == 'POST':
+        serializer = CetegorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+
+@api_view(['GET', 'POST'])
+def unit_list(request):
+    if request.method == 'GET':
+        drinks = Unit.objects.all()
+        serializer = UnitSerializer(drinks, many=True)
+        # return JsonResponse({"drinks": serializers.data})
+        return Response(serializer.data)
+        
+    
+    if request.method == 'POST':
+        serializer = UnitSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
