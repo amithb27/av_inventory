@@ -180,4 +180,5 @@ CELERY_BEAT_SCHEDULE = {
         'task':'userData.tasks.add',
         'schedule':4,
     }
+    
 }

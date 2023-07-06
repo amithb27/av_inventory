@@ -39,9 +39,15 @@ from userData.views import *
 from userData import views
 
 urlpatterns = [
+    #swagger
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    path('' , include("userData.urls"))
+    
+    #userData 
+    path('' , include("userData.urls")),
+    
+    #admin
+    path('admin/', admin.site.urls),
 ]
 
 

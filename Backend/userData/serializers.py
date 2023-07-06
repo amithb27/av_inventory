@@ -233,15 +233,14 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model : Notification
         fields = "__all__"  
-              
-           
-           
+                   
         
 class ProductSerializer(serializers.ModelSerializer):
     
     class Meta :
         model = Product
         fields = ["pk", "product_Name", "status"]
+    
         
 class BrandSerialilzer(serializers.ModelSerializer):
      
@@ -249,17 +248,20 @@ class BrandSerialilzer(serializers.ModelSerializer):
         model = Brand
         fields = ["brand_Name", "status"]
 
+
 class SizeSeriallizer(serializers.ModelSerializer):
 
     class Meta:
         model = Size
         fields = ["size_Name", "status"]
 
+
 class CetegorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cetegory
         fields = ["cetegory_Name", "status"]
+
 
 class UnitSerializer(serializers.ModelSerializer):
 

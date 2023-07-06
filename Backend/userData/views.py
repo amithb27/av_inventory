@@ -203,30 +203,10 @@ def post_user(self,request):
     if serializer.is_valid():
         data_Object = serializer.save()
         print(int(data_Object["pk"]))
-        response= requests.post(url=request.build_absolute_uri(reverse(viewname= "email_Service" , kwargs=({"pk": int(data_Object["pk"])}) )), data=data_Object)
+        response= requests.post(url=request.build_absolute_uri(reverse(viewname= "send_mail_with_login_creds" , kwargs=({"pk": int(data_Object["pk"])}) )), data=data_Object)
         return Response(data=response.json() ,status=response.status_code)
     else:    
         return Response( serializer.errors , status= status.HTTP_400_BAD_REQUEST)
-    
-
-def update_user(self ,request ):
-    # Handles the PATCH request to update the user password.
-    
-    # Args:
-    #     request (HttpRequest): The HTTP request object.
-
-    # Returns:
-    #     - JSON response with a success message: "Password changed"
-    #     - Status code: 200 (OK)
-    #     - JSON response with validation errors
-    #     - Status code: 400 (Bad Request)
-    
-    requested_User = request.user
-    serializer =  UserSerializer(data=request.data , instance=requested_User ) 
-    if serializer.is_valid():
-        serializer.save()
-        return Response(data={"message":"Password changed "} ,status=status.HTTP_200_OK)
-    return Response(data=serializer.errors , status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -530,6 +510,7 @@ def get_employee(request,pk):
     # Returns:
     #     - JSON response with serialized data of the available Employess
     #     - Status code: 200 (OK)
+    
     try :
         emp =  Employee.objects.get(pk=pk)
     except Exception as e :
