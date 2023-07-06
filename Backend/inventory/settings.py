@@ -183,7 +183,7 @@ CELERY_BEAT_SCHEDULE = {
     
 }
 
-
+#logging
 
 LOGGING = {
     'version': 1,
