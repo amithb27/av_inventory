@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import re_path
+from django.urls import re_path ,path ,include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -39,33 +39,9 @@ from userData.views import *
 from userData import views
 
 urlpatterns = [
-    path("temp/",Template,name="Temp"),
-    path('admin/', admin.site.urls),
-    path("employee/", Employees_List, name="employee_list"),
-    path("employee/<int:pk>", Employees_Details, name="employee_list" ),
-    path('rolehierarchy/', RoleHierarchy_View.as_view() , name="create_role" ),
-    path('rolehierarchy/<str:role>', GetRoleNode , name="reporting_role_callback"),
-    path('rolehierarchy/<int:pk>' , RoleHierarchy_View.as_view() , name ="updateHyrarchy"),
-    path('role/', Role_View.as_view() , name = "roles"),
-    path('role/<int:pk>', Get_Role , name = "get_roles"),
-    path('role/<int:pk>/update', Role_View.as_view() , name = "get_roles"),
-    path('login/', Login , name="Login "),
-    path('logout/', Logout, name="Logout "),
-    path( "user/ ",Create_User.as_view() ,  name="create_user"),
-    path("makeAdmin/" , Create_Admin.as_view(), name="create_admin"),
-    path("email/<int:pk>", SendMail , name="email_Service"),
-    path("permissions/<int:pk>",Employee_Permission.as_view() ,name="permission"),
-    path("mobileApp/",MobileProfile,name="profile"),
-    path('forgetPassword/' , ForgotPassword , name="forgetPassword"),
-    path('restPassword',ResetPassword , name="restPassword"),
-    path('triggerMail',TriggerMail , name='triggerMail'),
-    path('getempwithRole/<int:role>' ,GetEmployeeWithRole , name="GetEmployeeWithRole"),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    path('product/', views.product_list),
-    path('brand/', views.brand_list),
-    path('size/', views.size_list),
-    path('cetegory/', views.cetegory_list),
-    path('unit/', views.unit_list)
-    
+    path('' , include("userData.urls"))
 ]
+
+

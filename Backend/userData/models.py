@@ -2,12 +2,9 @@ from .deaultValues import *
 from django.db import models
 from django.contrib.auth.models import AbstractUser,Group , Permission 
 from treebeard.mp_tree import MP_Node
-from django.contrib import admin  
 
 # Create your models here.
 
-class AdminClass(admin.ModelAdmin):
-    readonly_fields = ("role_Modified","role_Created")
 
 class RoleHierarchy(MP_Node):
       
@@ -38,7 +35,7 @@ class Role(models.Model):
     def __str__(self):
         return self.name
 
-class Address(models.Model):
+class Master_Address(models.Model):
     
     #Model representing the address of employees.
 
@@ -93,7 +90,7 @@ class Employee(models.Model):
     modified_Person = models.CharField(max_length=200 ,null=True , blank=True)
     role = models.ForeignKey(Role, on_delete=models.PROTECT ,)
     reporting_Person = models.CharField(max_length=200)
-    address = models.ForeignKey(Address,on_delete=models.PROTECT  )
+    address = models.ForeignKey(Master_Address,on_delete=models.PROTECT  )
     registration_Date = models.DateField(auto_now_add=True)
     last_Modified = models.DateTimeField(auto_now=True)
     employee_Id = models.CharField(max_length=100,)
@@ -148,49 +145,49 @@ class user(AbstractUser):
     class Meta:  
         verbose_name_plural = "Users"
  
-# class Customer_Client_Details(models.Model):
-#     ## This creates a model for a Client_Details
-#     customer_Name = models.CharField(max_length=100)
-#     website = models.TextField(max_length=200)
-#     reference = models.TextField(max_length=200)
-#     description = models.TextField(max_length=200)
-#     phone_Number = models.IntegerField()
-#     landline_Number = models.IntegerField()
-#     pan_Number = models.CharField(max_length=100)
+class Customer_Client_Details(models.Model):
+    ## This creates a model for a Client_Details
+    customer_Name = models.CharField(max_length=100)
+    website = models.TextField(max_length=200)
+    reference = models.TextField(max_length=200)
+    description = models.TextField(max_length=200)
+    phone_Number = models.IntegerField()
+    landline_Number = models.IntegerField()
+    pan_Number = models.CharField(max_length=100)
     
-#     def __str__(self):
-#         return self.customer_Name       
+    def __str__(self):
+        return self.customer_Name       
 
-# class Customer_Billing_Details(models.Model):
+class Customer_Billing_Details(models.Model):
     
-#     ## This creates a model for a Billing_Details
-#     zone = models.CharField(max_length=100) 
-#     country = models.CharField(max_length=100) 
-#     state = models.CharField(max_length=100) 
-#     city = models.CharField(max_length=100) 
-#     pin_Code = models.IntegerField() 
-#     billing_Name = models.CharField(max_length=100) 
-#     billing_GSTIN = models.CharField(max_length=100) 
-#     pAN_Number = models.CharField(max_length=100) 
-#     udyog_Aadhar = models.IntegerField() 
-#     export_No = models.CharField(max_length=100) 
+    ## This creates a model for a Billing_Details
+    zone = models.CharField(max_length=100) 
+    country = models.CharField(max_length=100) 
+    state = models.CharField(max_length=100) 
+    city = models.CharField(max_length=100) 
+    pin_Code = models.IntegerField() 
+    billing_Name = models.CharField(max_length=100) 
+    billing_GSTIN = models.CharField(max_length=100) 
+    pAN_Number = models.CharField(max_length=100) 
+    udyog_Aadhar = models.IntegerField() 
+    export_No = models.CharField(max_length=100) 
 
-#     def __str__(self):
-#         return self.country 
+    def __str__(self):
+        return self.country 
 
-# class Customer_Shipping_Address(models.Model):
+class Customer_Shipping_Address(models.Model):
     
-#     ## This creates a model for a Shipping_Address
-#     address = models.CharField(max_length=100)
-#     zone = models.CharField(max_length=100)
-#     state = models.CharField(max_length=100)
-#     city = models.CharField(max_length=100)
-#     pin_Code = models.IntegerField()
-#     sales_Person = models.CharField(max_length=100)
+    ## This creates a model for a Shipping_Address
+    address = models.CharField(max_length=100)
+    zone = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    pin_Code = models.IntegerField()
+    sales_Person = models.CharField(max_length=100)
     
   
-#     def __str__(self):
-#         return self.name  
+    def __str__(self):
+        return self.name  
 
 class Company_Details(models.Model):
       company_Name =  models.CharField(max_length=100)
@@ -211,7 +208,7 @@ class Customer(models.Model):
         ## This creates a model for a Customer
      company_Details = models.ForeignKey(Company_Details , on_delete=models.CASCADE)
      contact_Details =  models.ForeignKey(Contact_Details , on_delete=models.CASCADE)
-     adress_Details = models.ForeignKey(Address , on_delete=models.CASCADE)
+     adress_Details = models.ForeignKey(Master_Address , on_delete=models.CASCADE)
      def __str__(self) :
           return  self.customer_Id  
       
@@ -228,7 +225,6 @@ class Inventory_Master(models.Model):
     max_Qty = models.CharField( max_length=100)  
 
 
-
 class Product(models.Model):
     product_Name = models.CharField(max_length=100)
     status = models.BooleanField(default=True)
@@ -241,6 +237,7 @@ class Brand(models.Model):
     status = models.BooleanField(default=True)
     def __str__(self):
         return self.brand_Name
+    
     
 class Size(models.Model):
     size_Name = models.CharField(max_length=100)
@@ -261,18 +258,5 @@ class Unit(models.Model):
     def __str__(self):
         return self.unit_name
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
+    

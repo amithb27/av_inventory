@@ -74,7 +74,7 @@ class RoleHierarchySerializer(serializers.ModelSerializer):
 class AdressSerializer(serializers.ModelSerializer):
     #serializes The Adress model
     class Meta:
-        model= Address
+        model= Master_Address
         fields=("country","city","state","zip_Code","zone")
         
 
@@ -116,7 +116,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
         zip_code = validated_data["address"]["zip_Code"]
         zone = validated_data["address"]["zone"]
         created_By = current_user.username  
-        my_Adress = Address.objects.create(
+        my_Adress = Master_Address.objects.create(
                                         city=city,
                                         country=country,
                                         zip_Code=zip_code, 
