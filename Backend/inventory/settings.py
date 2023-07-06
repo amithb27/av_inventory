@@ -182,3 +182,34 @@ CELERY_BEAT_SCHEDULE = {
     }
     
 }
+
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.FileHandler',
+            'filename':os.path.join(BASE_DIR,"userData","logging.log")
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'ERROR',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': "ERROR",
+            'propagate': False,
+        },
+    },
+        'loggers': {
+        'django.sub': {
+            'handlers': ['console'],
+            'level': "ERROR",
+            'propagate': True,
+        },
+    },
+}

@@ -19,7 +19,7 @@ from .serializers import *
 from django.contrib.auth.decorators import permission_required
 from django.utils import timezone
 from django.contrib.auth.models import Permission 
-
+import logging
 #**-----------------------------------------------------------------------**
 
 #utility  API'S
@@ -75,6 +75,8 @@ def send_mail_with_login_creds(request,pk):
 
 
 def Template(request):
+    log = logging.getLogger("django.sub")
+    log.warning("hii")
     my_date = timezone.now()
     joiningDate = my_date.strftime("%d - %B - %Y")
     year = my_date.strftime("%Y")
