@@ -832,3 +832,4 @@ def post_permission(request,pk):
     user = employee.user 
     user.user_permissions.add()
 
+
